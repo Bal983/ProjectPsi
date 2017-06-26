@@ -4,6 +4,25 @@
 	To create a simplistic tile based evolution simulator with AI aspects and and a simple GUI
 
 ## GRAND SCHEME
+0. A Menu System
+	* - [ ] A Main menu to select between:
+		* - [ ] Start a new simulation
+		* - [ ] Load an existing simulation (this is to come in the future)
+		* - [ ] Change some preliminary options
+		* - [ ] View the credits
+		* - [ ] Exit the game
+	* - [ ] The new simulaton menu
+		* - [ ] Need to be able to change a variety of parameters
+		* - [ ] Possibly an export button so that you can pass/save parameters
+	* - [ ] The load simulation Menu (possibly just load from a file, maybe save it to the system itself)
+	* - [ ] The Options Menu
+		* - [ ] Set size of the window
+		* - [ ] Change volumn
+		* - [ ] Set custom text colour scheme or something
+	* - [ ] The Credits Menu
+		* - [ ] Sam and Brytons name
+		* - [ ] Credits to any inclusions
+		* - [ ] Something else maybe
 1. A board representation
 	* - [ ] 2D square tiles
 2. Some analytics
