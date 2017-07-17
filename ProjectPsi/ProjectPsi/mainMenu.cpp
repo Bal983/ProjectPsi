@@ -37,13 +37,24 @@ mainMenu::mainMenu(int screenWidth, int screenHeight)
 
     myScreenWidth = screenWidth;
     myScreenHeight = screenHeight;
-    float trianglePositions[maxMenuItems][4] = {
-        { float(screenWidth)*0.35, float(screenHeight)*0.285, float(screenWidth)*0.65, float(screenHeight)*0.285 },
-        { float(screenWidth)*0.345, float(screenHeight)*0.435, float(screenWidth)*0.665, float(screenHeight)*0.435 },
-        { float(screenWidth)*0.4, float(screenHeight)*0.585, float(screenWidth)*0.6, float(screenHeight)*0.585 },
-        { float(screenWidth)*0.41, float(screenHeight)*0.735, float(screenWidth)*0.59, float(screenHeight)*0.735 },
-        { float(screenWidth)*0.43, float(screenHeight)*0.885, float(screenWidth)*0.57, float(screenHeight)*0.885 },
-    };
+
+    //Figure out an easier way to code this so its not so hardcoded
+    trianglePositions[0][0] = float(screenWidth)*0.35;
+    trianglePositions[0][1] = float(screenHeight)*0.285;
+    trianglePositions[0][2] = float(screenWidth)*0.65;
+    trianglePositions[1][0] = float(screenWidth)*0.345;
+    trianglePositions[1][1] = float(screenHeight)*0.435;
+    trianglePositions[1][2] = float(screenWidth)*0.665;
+    trianglePositions[2][0] = float(screenWidth)*0.4;
+    trianglePositions[2][1] = float(screenHeight)*0.585;
+    trianglePositions[2][2] = float(screenWidth)*0.6;
+    trianglePositions[3][0] = float(screenWidth)*0.41;
+    trianglePositions[3][1] = float(screenHeight)*0.735;
+    trianglePositions[3][2] = float(screenWidth)*0.59;
+    trianglePositions[4][0] = float(screenWidth)*0.43;
+    trianglePositions[4][1] = float(screenHeight)*0.885;
+    trianglePositions[4][2] = float(screenWidth)*0.57;
+
     initAddons(screenWidth, screenHeight);
     setupMenu();
 }
@@ -179,38 +190,41 @@ void mainMenu::drawTriangles(float topLeftX, float topLeftY, int direction, ALLE
     }
 }
 
-bool mainMenu::processMenu(int menuIndex) {
+tuple<bool, int> mainMenu::processMenu(int menuIndex) {
     switch (menuIndex) {
     case 0:
         cout << "New Simulation" << endl;
+        return make_tuple(false, 1);
         break;
     case 1:
         cout << "Load Simulation" << endl;
+        return make_tuple(false, 2);
         break;
     case 2:
         cout << "Options" << endl;
+        return make_tuple(false, 3);
         break;
     case 3:
         cout << "Credits" << endl;
+        return make_tuple(false, 4);
         break;
     case 4:
         cout << "Exit" << endl;
-        return true;
+        return make_tuple(true, -1);
         break;
     default:
         cout << "This menu doesn't exist, did you forget to add it to the process menu function?" << endl;
+        return make_tuple(false, -1);
     }
-    return false;
 }
 
 void mainMenu::drawMenuWithSelection(int previousSelection, int newSelection) {
-    al_flip_display();
     previousSelection = adjustMenuIndexAgainstMaxIndex(previousSelection);
     newSelection = adjustMenuIndexAgainstMaxIndex(newSelection);
     drawTriangles(trianglePositions[previousSelection][0], trianglePositions[previousSelection][1], 1, myBackgroundColour);
-    drawTriangles(trianglePositions[previousSelection][2], trianglePositions[previousSelection][3], -1, myBackgroundColour);
+    drawTriangles(trianglePositions[previousSelection][2], trianglePositions[previousSelection][1], -1, myBackgroundColour);
     drawTriangles(trianglePositions[newSelection][0], trianglePositions[newSelection][1], 1, myTextColour);
-    drawTriangles(trianglePositions[newSelection][2], trianglePositions[newSelection][3], -1, myTextColour);
+    drawTriangles(trianglePositions[newSelection][2], trianglePositions[newSelection][1], -1, myTextColour);
     al_flip_display();
 }
 

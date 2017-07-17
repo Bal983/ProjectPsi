@@ -1,6 +1,6 @@
 #pragma once
-#ifndef MAINMENU_H
-#define MAINMENU_H
+#ifndef NEWSIMULATION_H
+#define NEWSIMULATION_H
 
 #include "baseMenu.h"
 
@@ -10,10 +10,9 @@
 #include <allegro5/allegro_primitives.h>
 #include <tuple>
 
-class mainMenu: public baseMenu
+class newSimulation : public baseMenu
 {
     static const int maxMenuItems = 5;
-
 private:
     ALLEGRO_DISPLAY *myDisplay;
     ALLEGRO_EVENT_QUEUE *myEventQueue;
@@ -22,11 +21,7 @@ private:
     ALLEGRO_FONT *myOptionsFont;
     ALLEGRO_FONT *myTitleFont;
     ALLEGRO_USTR *titleString;
-    ALLEGRO_USTR *newSimulationString;
-    ALLEGRO_USTR *loadSimulationString;
-    ALLEGRO_USTR *optionsString;
-    ALLEGRO_USTR *creditsString;
-    ALLEGRO_USTR *quitString;
+    ALLEGRO_USTR *goBackString;
     ALLEGRO_USTR *allTitleScreenOptions[maxMenuItems];
     int myScreenWidth;
     int myScreenHeight;
@@ -36,8 +31,8 @@ private:
     void setupMenu();
     void initAddons(int, int);
 public:
-    mainMenu(int, int);
-    ~mainMenu();
+    newSimulation(int, int);
+    ~newSimulation();
     int getMaxMenuItems();
     int adjustMenuIndexAgainstMaxIndex(int);
     std::tuple<bool, int> processMenu(int);

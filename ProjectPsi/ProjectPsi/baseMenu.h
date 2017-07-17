@@ -16,7 +16,7 @@ public:
     virtual void moveMenuSelectionUp(int) = 0;
     virtual void moveMenuSelectionDown(int) = 0;
     virtual int adjustMenuIndexAgainstMaxIndex(int) = 0;
-    virtual bool processMenu(int) = 0;
+    virtual std::tuple<bool, int> processMenu(int) = 0;
     virtual ALLEGRO_EVENT waitForEvent() = 0;
 
 };
