@@ -630,6 +630,9 @@ void setupCreditsScreen()
 
 //Initialization Functions
 int initAddons() {
+
+	const char * fontPath = "assets\\testFont.ttf";
+
     if (!al_init() && !al_init_font_addon() && !al_install_keyboard()) {
         cout << "failed to initialize allegro!" << endl;
         return -1;
@@ -656,21 +659,21 @@ int initAddons() {
         return -1;
     }
 
-    screenOptionsFont = al_load_ttf_font("C:/Users/Bryton/Desktop/projectPsiResources/testFont.ttf", 50, 0);
+    screenOptionsFont = al_load_ttf_font(fontPath, 50, 0);
     if (!screenOptionsFont) {
         cout << "Could not load \"testFont.ttf\"" << endl;
         cout << "Make sure the correct font is in the executable location!" << endl;
         screenOptionsFont = al_create_builtin_font();
     }
 
-    screenOptionsSmallFont = al_load_ttf_font("C:/Users/Bryton/Desktop/projectPsiResources/testFont.ttf", 35, 0);
+    screenOptionsSmallFont = al_load_ttf_font(fontPath, 35, 0);
     if (!screenOptionsSmallFont) {
         cout << "Could not load \"testFont.ttf\"" << endl;
         cout << "Make sure the correct font is in the executable location!" << endl;
         screenOptionsSmallFont = al_create_builtin_font();
     }
 
-    screenTitleFont = al_load_ttf_font("C:/Users/Bryton/Desktop/projectPsiResources/testFont.ttf", 108, 0);
+    screenTitleFont = al_load_ttf_font(fontPath, 108, 0);
     if (!screenTitleFont) {
         cout << "Could not load \"testFont.ttf\"" << endl;
         cout << "Make sure the correct font is in the executable location!" << endl;
