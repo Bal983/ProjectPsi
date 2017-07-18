@@ -8,9 +8,9 @@
 	* - [ ] A Main menu to select between:
 		* - [ ] Start a new simulation
 		* - [ ] Load an existing simulation (this is to come in the future)
-		* - [ x ] View the controls
-		* - [ x ] View the credits
-		* - [ x ] Exit the game
+		* - [x] View the controls
+		* - [x] View the credits
+		* - [x] Exit the game
 	* - [ ] The new simulaton menu
 		* - [ ] Need to be able to change a variety of parameters
 		* - [ ] Possibly an export button so that you can pass/save parameters
@@ -23,12 +23,12 @@
 		* It should have the following functionality:
 			* Load from a save file
 			* Maybe have some sort of "load from string" functionality in which the menu will generate a simulation starting at some point
-	* - [ x ] The Controls Menu
-		* - [ x ] Display a list of controls, possibly with images
+	* - [x] The Controls Menu
+		* - [x] Display a list of controls, possibly with images
 	* - [ ] The Credits Menu
-		* - [ x ] Sam and Brytons name
-		* - [ x ] Credits to any inclusions
-		* - [ x ] Something else maybe
+		* - [x] Sam and Brytons name
+		* - [x] Credits to any inclusions
+		* - [x] Something else maybe
 1. A board representation
 	* - [ ] 2D square tiles
 2. Some analytics
