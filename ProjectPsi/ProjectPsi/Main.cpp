@@ -19,8 +19,28 @@ ALLEGRO_DISPLAY *settingsDisplay = NULL;
 ALLEGRO_DISPLAY *mainDisplay = NULL;
 ALLEGRO_EVENT_QUEUE *mainEventQueue = NULL;
 bool quit = false;
-static int screenWidth;
-static int screenHeight;
+
+//Try to keep only 16:9 resolution setups
+//static const int SCREENWIDTH = 1920;
+//static const int SCREENHEIGHT = 1080;
+static const int SCREENWIDTH = 1280;
+static const int SCREENHEIGHT = 720;
+
+//Variables used to initialize the simulation
+string leftValue1;
+string leftValue2;
+string leftValue3;
+string leftValue4;
+string leftValue5;
+string leftValue6;
+string leftValue7;
+string rightValue1;
+string rightValue2;
+string rightValue3;
+string rightValue4;
+string rightValue5;
+string rightValue6;
+string rightValue7;
 
 //Title Screen Variables
 ALLEGRO_USTR *mainMenuScreenTitle = al_ustr_new("Project Psi");
@@ -40,10 +60,52 @@ ALLEGRO_USTR *allTitleScreenOptions[titleScreenMenuItems] = {
 
 //New Simulation Screen Variables
 ALLEGRO_USTR *newSimulationScreenTitle = al_ustr_new("New Simulation");
+ALLEGRO_USTR *newSimulationLeftp1prompt = al_ustr_new("Placeholder:");
+ALLEGRO_USTR *newSimulationLeftp2prompt = al_ustr_new("Placeholder:");
+ALLEGRO_USTR *newSimulationLeftp3prompt = al_ustr_new("Placeholder:");
+ALLEGRO_USTR *newSimulationLeftp4prompt = al_ustr_new("Placeholder:");
+ALLEGRO_USTR *newSimulationLeftp5prompt = al_ustr_new("Placeholder:");
+ALLEGRO_USTR *newSimulationLeftp6prompt = al_ustr_new("Placeholder:");
+ALLEGRO_USTR *newSimulationLeftp7prompt = al_ustr_new("Placeholder:");
+ALLEGRO_USTR *newSimulationLeftp1value = al_ustr_new("Value");
+ALLEGRO_USTR *newSimulationLeftp2value = al_ustr_new("Value");
+ALLEGRO_USTR *newSimulationLeftp3value = al_ustr_new("Value");
+ALLEGRO_USTR *newSimulationLeftp4value = al_ustr_new("Value");
+ALLEGRO_USTR *newSimulationLeftp5value = al_ustr_new("Value");
+ALLEGRO_USTR *newSimulationLeftp6value = al_ustr_new("Value");
+ALLEGRO_USTR *newSimulationLeftp7value = al_ustr_new("Value");
+ALLEGRO_USTR *newSimulationRightp1prompt = al_ustr_new("Placeholder:");
+ALLEGRO_USTR *newSimulationRightp2prompt = al_ustr_new("Placeholder:");
+ALLEGRO_USTR *newSimulationRightp3prompt = al_ustr_new("Placeholder:");
+ALLEGRO_USTR *newSimulationRightp4prompt = al_ustr_new("Placeholder:");
+ALLEGRO_USTR *newSimulationRightp5prompt = al_ustr_new("Placeholder:");
+ALLEGRO_USTR *newSimulationRightp6prompt = al_ustr_new("Placeholder:");
+ALLEGRO_USTR *newSimulationRightp7prompt = al_ustr_new("Placeholder:");
+ALLEGRO_USTR *newSimulationRightp1value = al_ustr_new("Value");
+ALLEGRO_USTR *newSimulationRightp2value = al_ustr_new("Value");
+ALLEGRO_USTR *newSimulationRightp3value = al_ustr_new("Value");
+ALLEGRO_USTR *newSimulationRightp4value = al_ustr_new("Value");
+ALLEGRO_USTR *newSimulationRightp5value = al_ustr_new("Value");
+ALLEGRO_USTR *newSimulationRightp6value = al_ustr_new("Value");
+ALLEGRO_USTR *newSimulationRightp7value = al_ustr_new("Value");
 ALLEGRO_USTR *newSimulationGoBackString = al_ustr_new("Go Back");
-const int newSimulationScreenMenuItems = 1; //Don't count the title in here
-ALLEGRO_USTR *allNewSimulationScreenOptions[newSimulationScreenMenuItems] = {
-    newSimulationGoBackString
+const int newSimulationScreenMenuItems = 15; //Don't count the title in here
+tuple<ALLEGRO_USTR,ALLEGRO_USTR> allNewSimulationScreenOptions[newSimulationScreenMenuItems] = {
+	make_tuple(*newSimulationLeftp1prompt, *newSimulationLeftp1value),
+	make_tuple(*newSimulationLeftp2prompt, *newSimulationLeftp2value),
+	make_tuple(*newSimulationLeftp3prompt, *newSimulationLeftp3value),
+	make_tuple(*newSimulationLeftp4prompt, *newSimulationLeftp4value),
+	make_tuple(*newSimulationLeftp5prompt, *newSimulationLeftp5value),
+	make_tuple(*newSimulationLeftp6prompt, *newSimulationLeftp6value),
+	make_tuple(*newSimulationLeftp7prompt, *newSimulationLeftp7value),
+	make_tuple(*newSimulationRightp1prompt, *newSimulationRightp1value),
+	make_tuple(*newSimulationRightp2prompt, *newSimulationRightp2value),
+	make_tuple(*newSimulationRightp3prompt, *newSimulationRightp3value),
+	make_tuple(*newSimulationRightp4prompt, *newSimulationRightp4value),
+	make_tuple(*newSimulationRightp5prompt, *newSimulationRightp5value),
+	make_tuple(*newSimulationRightp6prompt, *newSimulationRightp6value),
+	make_tuple(*newSimulationRightp7prompt, *newSimulationRightp7value),
+	make_tuple(*newSimulationGoBackString, *newSimulationGoBackString)
 }; //add new menu options to this array, make sure to increment maxMenuItems, so far this is just for us to keep track of them
 
 //Load Simulation Screen Variables
@@ -103,17 +165,21 @@ ALLEGRO_FONT *screenTitleFont = NULL;
 void drawTriangle(float, float, int, ALLEGRO_COLOR);
 tuple<bool, string> processMenu(string, int);
 void loadNewMenu(string);
+int normalizeScreenIndex(int, int);
 
 //Title Screen Functions
 void setupTitleScreen();
 int normalizeTitleScreenIndex(int);
-void moveTitleScreenDown(int, int);
-void moveTitleScreenUp(int, int);
-void drawTitleScreenWithSelection(int, int, int);
+void moveTitleScreenDown(int);
+void moveTitleScreenUp(int);
+void drawTitleScreenWithSelection(int, int);
 
 //New Simulation Functions
 void setupNewSimulationScreen();
 int normalizeNewSimulationScreenIndex(int);
+void moveNewSimulationScreenDown(int);
+void moveNewSimulationScreenUp(int);
+void drawNewSimulationScreenWithSelection(int, int);
 
 //Load Simulation Functions
 void setupLoadSimulationScreen();
@@ -128,7 +194,6 @@ void setupCreditsScreen();
 //Init Functions
 int initAddons();
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 int main(int argc, char **argv) {
 
     if (initAddons() == -1) {
@@ -137,117 +202,146 @@ int main(int argc, char **argv) {
 
     setupTitleScreen();
 
+	bool valueInputMode = false;
     int currentMenuIndex = 0;
     string currentMenu = "Title Screen";
     while (!quit) {
-        ALLEGRO_EVENT event;
-        al_wait_for_event(mainEventQueue, &event);
-        switch (event.type) {
-        case ALLEGRO_EVENT_DISPLAY_CLOSE: //This triggers when you hit the x on the window
-            quit = true;
-            break;
-        case ALLEGRO_EVENT_KEY_DOWN:
-            switch (event.keyboard.keycode) {
-            case ALLEGRO_KEY_BACKSPACE:
-                if (currentMenu == "Title Screen") {
-                    quit = true;
-                }
-                else {
-                    currentMenu = "Title Screen";
-                    currentMenuIndex = 0;
-                    setupTitleScreen();
-                }
-                break;
-            case ALLEGRO_KEY_ESCAPE:
-                quit = true;
-                break;
-            case ALLEGRO_KEY_ENTER:
-                if (currentMenu == "Title Screen") {
-                    auto response = processMenu("Title Screen", currentMenuIndex);
-                    quit = get<0>(response);
-                    loadNewMenu(get<1>(response));
-                    currentMenu = get<1>(response);
-                    currentMenuIndex = 0;
-                }
-                else if (currentMenu == "New Simulation") {
-                    auto response = processMenu("New Simulation", currentMenuIndex);
-                    quit = get<0>(response);
-                    loadNewMenu(get<1>(response));
-                    currentMenu = get<1>(response);
-                    currentMenuIndex = 0;
-                }
-                else if (currentMenu == "Load Simulation") {
-                    auto response = processMenu("Load Simulation", currentMenuIndex);
-                    quit = get<0>(response);
-                    loadNewMenu(get<1>(response));
-                    currentMenu = get<1>(response);
-                    currentMenuIndex = 0;
-                }
-                else if (currentMenu == "Options") {
-                    auto response = processMenu("Options", currentMenuIndex);
-                    quit = get<0>(response);
-                    loadNewMenu(get<1>(response));
-                    currentMenu = get<1>(response);
-                    currentMenuIndex = 0;
-                }
-                else if (currentMenu == "Credits") {
-                    auto response = processMenu("Credits", currentMenuIndex);
-                    quit = get<0>(response);
-                    loadNewMenu(get<1>(response));
-                    currentMenu = get<1>(response);
-                    currentMenuIndex = 0;
-                }
-                break;
-            case ALLEGRO_KEY_DOWN:
-                if (currentMenu == "Title Screen") {
-                    moveTitleScreenDown(currentMenuIndex, titleScreenMenuItems);
-                }
-                else if (currentMenu == "New Simulation") {
+		ALLEGRO_EVENT event;
+		al_wait_for_event(mainEventQueue, &event);
+		if (!valueInputMode) {
+			switch (event.type) {
+			case ALLEGRO_EVENT_DISPLAY_CLOSE: //This triggers when you hit the x on the window
+				quit = true;
+				break;
+			case ALLEGRO_EVENT_KEY_DOWN:
+				switch (event.keyboard.keycode) {
+				case ALLEGRO_KEY_BACKSPACE:
+					if (currentMenu == "Title Screen") {
+						quit = true;
+					}
+					else {
+						currentMenu = "Title Screen";
+						currentMenuIndex = 0;
+						setupTitleScreen();
+					}
+					break;
+				case ALLEGRO_KEY_ESCAPE:
+					quit = true;
+					break;
+				case ALLEGRO_KEY_ENTER:
+					if (currentMenu == "Title Screen") {
+						auto response = processMenu("Title Screen", currentMenuIndex);
+						quit = get<0>(response);
+						loadNewMenu(get<1>(response));
+						currentMenu = get<1>(response);
+						currentMenuIndex = 0;
+					}
+					else if (currentMenu == "New Simulation") {
+						auto response = processMenu("New Simulation", currentMenuIndex);
+						valueInputMode = get<0>(response);
+						if (!valueInputMode){
+							loadNewMenu(get<1>(response));
+							currentMenu = get<1>(response);
+							currentMenuIndex = 0;
+						}
+					}
+					else if (currentMenu == "Load Simulation") {
+						auto response = processMenu("Load Simulation", currentMenuIndex);
+						quit = get<0>(response);
+						loadNewMenu(get<1>(response));
+						currentMenu = get<1>(response);
+						currentMenuIndex = 0;
+					}
+					else if (currentMenu == "Options") {
+						auto response = processMenu("Options", currentMenuIndex);
+						quit = get<0>(response);
+						loadNewMenu(get<1>(response));
+						currentMenu = get<1>(response);
+						currentMenuIndex = 0;
+					}
+					else if (currentMenu == "Credits") {
+						auto response = processMenu("Credits", currentMenuIndex);
+						quit = get<0>(response);
+						loadNewMenu(get<1>(response));
+						currentMenu = get<1>(response);
+						currentMenuIndex = 0;
+					}
+					break;
+				case ALLEGRO_KEY_DOWN:
+					if (currentMenu == "Title Screen") {
+						moveTitleScreenDown(currentMenuIndex);
+					}
+					else if (currentMenu == "New Simulation") {
+						moveNewSimulationScreenDown(currentMenuIndex);
+					}
+					else if (currentMenu == "Load Simulation") {
 
-                }
-                else if (currentMenu == "Load Simulation") {
+					}
+					currentMenuIndex++;
+					break;
+				case ALLEGRO_KEY_S:
+					if (currentMenu == "Title Screen") {
+						moveTitleScreenDown(currentMenuIndex);
+					}
+					else if (currentMenu == "New Simulation") {
+						moveNewSimulationScreenDown(currentMenuIndex);
+					}
+					else if (currentMenu == "Load Simulation") {
 
-                }
-                currentMenuIndex++;
-                break;
-            case ALLEGRO_KEY_S:
-                if (currentMenu == "Title Screen") {
-                    moveTitleScreenDown(currentMenuIndex, titleScreenMenuItems);
-                }
-                else if (currentMenu == "New Simulation") {
+					}
+					currentMenuIndex++;
+					break;
+				case ALLEGRO_KEY_UP:
+					if (currentMenu == "Title Screen") {
+						moveTitleScreenUp(currentMenuIndex);
+					}
+					else if (currentMenu == "New Simulation") {
+						moveNewSimulationScreenUp(currentMenuIndex);
+					}
+					else if (currentMenu == "Load Simulation") {
 
-                }
-                else if (currentMenu == "Load Simulation") {
+					}
+					currentMenuIndex--;
+					break;
+				case ALLEGRO_KEY_W:
+					if (currentMenu == "Title Screen") {
+						moveTitleScreenUp(currentMenuIndex);
+					}
+					else if (currentMenu == "New Simulation") {
+						moveNewSimulationScreenUp(currentMenuIndex);
+					}
+					else if (currentMenu == "Load Simulation") {
 
-                }
-                currentMenuIndex++;
-                break;
-            case ALLEGRO_KEY_UP:
-                if (currentMenu == "Title Screen") {
-                    moveTitleScreenUp(currentMenuIndex, titleScreenMenuItems);
-                }
-                else if (currentMenu == "New Simulation") {
-
-                }
-                else if (currentMenu == "Load Simulation") {
-
-                }
-                currentMenuIndex--;
-                break;
-            case ALLEGRO_KEY_W:
-                if (currentMenu == "Title Screen") {
-                    moveTitleScreenUp(currentMenuIndex, titleScreenMenuItems);
-                }
-                else if (currentMenu == "New Simulation") {
-
-                }
-                else if (currentMenu == "Load Simulation") {
-
-                }
-                currentMenuIndex--;
-                break;
-            }
-        }
+					}
+					currentMenuIndex--;
+					break;
+				}
+			}
+		}
+		 else {
+			 switch (event.type) {
+			 case ALLEGRO_EVENT_KEY_DOWN:
+				 switch (event.keyboard.keycode) {
+				 case ALLEGRO_KEY_ENTER:
+					 valueInputMode = false;
+					 break;
+				 case ALLEGRO_KEY_ESCAPE:
+					 quit = true;
+					 break;
+				 case ALLEGRO_KEY_BACKSPACE:
+					 if (currentMenu == "New Simulation") {
+						 auto manipulationTuple = allNewSimulationScreenOptions[normalizeNewSimulationScreenIndex(currentMenuIndex)];
+						 al_ustr_remove_chr(&get<1>(manipulationTuple), al_ustr_length(&get<1>(manipulationTuple)) - 1);
+						 cout << "Removing the last character" << endl;
+					 }
+					 break;
+				 default:
+					 if (currentMenu == "New Simulation") {
+						 cout << "appending character: " << event.keyboard.keycode << endl;
+					 }
+				 }
+			 }
+		}
     }
     return 0;
 }
@@ -257,14 +351,14 @@ int main(int argc, char **argv) {
 void drawTriangle(float topLeftX, float topLeftY, int direction, ALLEGRO_COLOR colour) {
     if (direction > 0) {
         al_draw_filled_triangle(topLeftX, topLeftY,
-            topLeftX + screenWidth*0.02, topLeftY + screenHeight*0.02,
-            topLeftX, topLeftY + screenHeight* 0.04,
+            topLeftX + SCREENWIDTH*0.02, topLeftY + SCREENHEIGHT*0.02,
+            topLeftX, topLeftY + SCREENHEIGHT* 0.04,
             colour);
     }
     else {
         al_draw_filled_triangle(topLeftX, topLeftY,
-            topLeftX - screenWidth*0.02, topLeftY + screenHeight*0.02,
-            topLeftX, topLeftY + screenHeight* 0.04,
+            topLeftX - SCREENWIDTH*0.02, topLeftY + SCREENHEIGHT*0.02,
+            topLeftX, topLeftY + SCREENHEIGHT* 0.04,
             colour);
     }
 }
@@ -290,9 +384,11 @@ tuple<bool, string> processMenu(string currentMenu, int currentMenuIndex) {
     else if (currentMenu == "New Simulation") {
         currentMenuIndex = normalizeNewSimulationScreenIndex(currentMenuIndex);
         switch (currentMenuIndex) {
-        case(0):
+        case(14):
             return make_tuple(false, "Title Screen");
-        }
+		default: //note, this makes the code smaller to write but it makes the error cases (that shouldn't arise) hard to handle.
+			return make_tuple(true, "New Simulation");
+		}
     }
     else if (currentMenu == "Load Simulation") {
         currentMenuIndex = normalizeLoadSimulationScreenIndex(currentMenuIndex);
@@ -328,90 +424,110 @@ void loadNewMenu(string newMenu) {
     }
 }
 
+int normalizeScreenIndex(int abnormalIndex, int maxMenuIndex) {
+	if (abnormalIndex < 0) {
+		while (abnormalIndex < 0) {
+			abnormalIndex += maxMenuIndex;
+		}
+		return abnormalIndex;
+	}
+	else if (abnormalIndex > maxMenuIndex - 1) {
+		while (abnormalIndex > maxMenuIndex - 1) {
+			abnormalIndex -= maxMenuIndex;
+		}
+		return abnormalIndex;
+	}
+	else {
+		return abnormalIndex;
+	}
+}
+
 //Title Screen Functions
 void setupTitleScreen() {
     al_set_window_title(mainDisplay, "Project Psi Title Screen");
     al_clear_to_color(screenBackgroundColour);
     al_draw_ustr(screenTitleFont,
         screenOptionsColour,
-        screenWidth*0.5,
-        screenHeight*0.005,
+        SCREENWIDTH*0.5,
+        SCREENHEIGHT*0.005,
         ALLEGRO_ALIGN_CENTRE,
         mainMenuScreenTitle
     );
+	//Horizontal Bar
     al_draw_rectangle(
         0,
-        screenHeight*0.193,
-        screenWidth,
-        screenHeight*0.197,
+        SCREENHEIGHT*0.193,
+        SCREENWIDTH,
+        SCREENHEIGHT*0.197,
         screenOptionsColour,
         7
     );
     al_draw_ustr(screenOptionsFont,
         screenOptionsColour,
-        screenWidth*0.5,
-        screenHeight*0.25,
+        SCREENWIDTH*0.5,
+        SCREENHEIGHT*0.25,
         ALLEGRO_ALIGN_CENTRE,
         newSimulationString
     );
     al_draw_ustr(screenOptionsFont,
         screenOptionsColour,
-        screenWidth*0.5,
-        screenHeight*0.40,
+        SCREENWIDTH*0.5,
+        SCREENHEIGHT*0.40,
         ALLEGRO_ALIGN_CENTRE,
         loadSimulationString
     );
     al_draw_ustr(screenOptionsFont,
         screenOptionsColour,
-        screenWidth*0.5,
-        screenHeight*0.55,
+        SCREENWIDTH*0.5,
+        SCREENHEIGHT*0.55,
         ALLEGRO_ALIGN_CENTRE,
         optionsString
     );
     al_draw_ustr(screenOptionsFont,
         screenOptionsColour,
-        screenWidth*0.5,
-        screenHeight*0.70,
+        SCREENWIDTH*0.5,
+        SCREENHEIGHT*0.70,
         ALLEGRO_ALIGN_CENTRE,
         creditsString
     );
     al_draw_ustr(screenOptionsFont,
         screenOptionsColour,
-        screenWidth*0.5,
-        screenHeight*0.85,
+        SCREENWIDTH*0.5,
+        SCREENHEIGHT*0.85,
         ALLEGRO_ALIGN_CENTRE,
         quitString
     );
-    drawTriangle(float(screenWidth)*0.35, float(screenHeight)*0.285, 1, screenOptionsColour);
-    drawTriangle(float(screenWidth)*0.65, float(screenHeight)*0.285, -1, screenOptionsColour);
+    drawTriangle(float(SCREENWIDTH)*0.35, float(SCREENHEIGHT)*0.285, 1, screenOptionsColour);
+    drawTriangle(float(SCREENWIDTH)*0.65, float(SCREENHEIGHT)*0.285, -1, screenOptionsColour);
     al_flip_display();
 }
 
 int normalizeTitleScreenIndex(int abnormalIndex) {
-    return abs(abnormalIndex) % titleScreenMenuItems;
+	return normalizeScreenIndex(abnormalIndex, titleScreenMenuItems);
 }
 
-void moveTitleScreenDown(int currentMenuIndex, int maxMenuItems) {
-    drawTitleScreenWithSelection(currentMenuIndex, currentMenuIndex + 1, maxMenuItems);
+void moveTitleScreenDown(int currentMenuIndex) {
+    drawTitleScreenWithSelection(currentMenuIndex, currentMenuIndex + 1);
 }
 
-void moveTitleScreenUp(int currentMenuIndex, int maxMenuItems) {
-    drawTitleScreenWithSelection(currentMenuIndex, currentMenuIndex - 1, maxMenuItems);
+void moveTitleScreenUp(int currentMenuIndex) {
+    drawTitleScreenWithSelection(currentMenuIndex, currentMenuIndex - 1);
 }
 
-void drawTitleScreenWithSelection(int previousSelection, int newSelection, int maxMenuItems) {
+void drawTitleScreenWithSelection(int previousSelection, int newSelection) {
     //These are in format leftTriangleX1, triangleY, rightTriangleX1
     float titleScreenArrows[][3] = {
-        { float(screenWidth)*0.35, float(screenHeight)*0.285, float(screenWidth)*0.65 },
-        { float(screenWidth)*0.345, float(screenHeight)*0.435, float(screenWidth)*0.665 },
-        { float(screenWidth)*0.4, float(screenHeight)*0.585, float(screenWidth)*0.6 },
-        { float(screenWidth)*0.41, float(screenHeight)*0.735, float(screenWidth)*0.59 },
-        { float(screenWidth)*0.43, float(screenHeight)*0.885, float(screenWidth)*0.57 },
+        { float(SCREENWIDTH)*0.35, float(SCREENHEIGHT)*0.285, float(SCREENWIDTH)*0.65 },
+        { float(SCREENWIDTH)*0.345, float(SCREENHEIGHT)*0.435, float(SCREENWIDTH)*0.665 },
+        { float(SCREENWIDTH)*0.4, float(SCREENHEIGHT)*0.585, float(SCREENWIDTH)*0.6 },
+        { float(SCREENWIDTH)*0.41, float(SCREENHEIGHT)*0.735, float(SCREENWIDTH)*0.59 },
+        { float(SCREENWIDTH)*0.43, float(SCREENHEIGHT)*0.885, float(SCREENWIDTH)*0.57 },
     };
 
+	previousSelection = normalizeTitleScreenIndex(previousSelection);
+	newSelection = normalizeTitleScreenIndex(newSelection);
+
     al_flip_display();
-    previousSelection = abs(previousSelection % maxMenuItems);
-    newSelection = abs(newSelection % maxMenuItems);
     drawTriangle(titleScreenArrows[previousSelection][0], titleScreenArrows[previousSelection][1], 1, screenBackgroundColour);
     drawTriangle(titleScreenArrows[previousSelection][2], titleScreenArrows[previousSelection][1], -1, screenBackgroundColour);
     drawTriangle(titleScreenArrows[newSelection][0], titleScreenArrows[newSelection][1], 1, screenOptionsColour);
@@ -424,41 +540,298 @@ void setupNewSimulationScreen() {
     al_clear_to_color(screenBackgroundColour);
     al_draw_ustr(screenTitleFont,
         screenOptionsColour,
-        screenWidth*0.5,
-        screenHeight*0.005,
+        SCREENWIDTH*0.5,
+        SCREENHEIGHT*0.005,
         ALLEGRO_ALIGN_CENTRE,
         newSimulationScreenTitle
     );
+	//Horizontal Bar
     al_draw_rectangle(
         0,
-        screenHeight*0.193,
-        screenWidth,
-        screenHeight*0.197,
+        SCREENHEIGHT*0.193,
+        SCREENWIDTH,
+        SCREENHEIGHT*0.197,
         screenOptionsColour,
         7
     );
+	//Vertical Bar
     al_draw_rectangle(
-        screenWidth*0.4995,
-        screenHeight*0.193,
-        screenWidth*0.5005,
-        screenHeight*0.84,
+        SCREENWIDTH*0.4995,
+        SCREENHEIGHT*0.193,
+        SCREENWIDTH*0.5005,
+        SCREENHEIGHT*0.903,
         screenOptionsColour,
         1
-    );    
+    );
+	//Lefthand Side Options
+	al_draw_ustr(screenOptionsFont,
+		screenOptionsColour,
+		SCREENWIDTH*0.1,
+		SCREENHEIGHT*0.2,
+		ALLEGRO_ALIGN_CENTRE,
+		newSimulationLeftp1prompt
+	);
+	al_draw_ustr(screenOptionsFont,
+		screenOptionsColour,
+		SCREENWIDTH*0.3,
+		SCREENHEIGHT*0.2,
+		ALLEGRO_ALIGN_CENTRE,
+		newSimulationLeftp1value
+	);
+	al_draw_ustr(screenOptionsFont,
+		screenOptionsColour,
+		SCREENWIDTH*0.1,
+		SCREENHEIGHT*0.3,
+		ALLEGRO_ALIGN_CENTRE,
+		newSimulationLeftp2prompt
+	);
+	al_draw_ustr(screenOptionsFont,
+		screenOptionsColour,
+		SCREENWIDTH*0.3,
+		SCREENHEIGHT*0.3,
+		ALLEGRO_ALIGN_CENTRE,
+		newSimulationLeftp2value
+	);
+	al_draw_ustr(screenOptionsFont,
+		screenOptionsColour,
+		SCREENWIDTH*0.1,
+		SCREENHEIGHT*0.4,
+		ALLEGRO_ALIGN_CENTRE,
+		newSimulationLeftp3prompt
+	);
+	al_draw_ustr(screenOptionsFont,
+		screenOptionsColour,
+		SCREENWIDTH*0.3,
+		SCREENHEIGHT*0.4,
+		ALLEGRO_ALIGN_CENTRE,
+		newSimulationLeftp3value
+	);
+	al_draw_ustr(screenOptionsFont,
+		screenOptionsColour,
+		SCREENWIDTH*0.1,
+		SCREENHEIGHT*0.5,
+		ALLEGRO_ALIGN_CENTRE,
+		newSimulationLeftp4prompt
+	);
+	al_draw_ustr(screenOptionsFont,
+		screenOptionsColour,
+		SCREENWIDTH*0.3,
+		SCREENHEIGHT*0.5,
+		ALLEGRO_ALIGN_CENTRE,
+		newSimulationLeftp4value
+	);
+	al_draw_ustr(screenOptionsFont,
+		screenOptionsColour,
+		SCREENWIDTH*0.1,
+		SCREENHEIGHT*0.6,
+		ALLEGRO_ALIGN_CENTRE,
+		newSimulationLeftp5prompt
+	);
+	al_draw_ustr(screenOptionsFont,
+		screenOptionsColour,
+		SCREENWIDTH*0.3,
+		SCREENHEIGHT*0.6,
+		ALLEGRO_ALIGN_CENTRE,
+		newSimulationLeftp5value
+	);
+	al_draw_ustr(screenOptionsFont,
+		screenOptionsColour,
+		SCREENWIDTH*0.1,
+		SCREENHEIGHT*0.7,
+		ALLEGRO_ALIGN_CENTRE,
+		newSimulationLeftp6prompt
+	);
+	al_draw_ustr(screenOptionsFont,
+		screenOptionsColour,
+		SCREENWIDTH*0.3,
+		SCREENHEIGHT*0.7,
+		ALLEGRO_ALIGN_CENTRE,
+		newSimulationLeftp6value
+	);
+	al_draw_ustr(screenOptionsFont,
+		screenOptionsColour,
+		SCREENWIDTH*0.1,
+		SCREENHEIGHT*0.8,
+		ALLEGRO_ALIGN_CENTRE,
+		newSimulationLeftp7prompt
+	);
+	al_draw_ustr(screenOptionsFont,
+		screenOptionsColour,
+		SCREENWIDTH*0.3,
+		SCREENHEIGHT*0.8,
+		ALLEGRO_ALIGN_CENTRE,
+		newSimulationLeftp7value
+	);
+	//Righthand Side Options
+	al_draw_ustr(screenOptionsFont,
+		screenOptionsColour,
+		SCREENWIDTH*0.6,
+		SCREENHEIGHT*0.2,
+		ALLEGRO_ALIGN_CENTRE,
+		newSimulationRightp1prompt
+	);
+	al_draw_ustr(screenOptionsFont,
+		screenOptionsColour,
+		SCREENWIDTH*0.8,
+		SCREENHEIGHT*0.2,
+		ALLEGRO_ALIGN_CENTRE,
+		newSimulationRightp1value
+	);
+	al_draw_ustr(screenOptionsFont,
+		screenOptionsColour,
+		SCREENWIDTH*0.6,
+		SCREENHEIGHT*0.3,
+		ALLEGRO_ALIGN_CENTRE,
+		newSimulationRightp2prompt
+	);
+	al_draw_ustr(screenOptionsFont,
+		screenOptionsColour,
+		SCREENWIDTH*0.8,
+		SCREENHEIGHT*0.3,
+		ALLEGRO_ALIGN_CENTRE,
+		newSimulationRightp2value
+	);
+	al_draw_ustr(screenOptionsFont,
+		screenOptionsColour,
+		SCREENWIDTH*0.6,
+		SCREENHEIGHT*0.4,
+		ALLEGRO_ALIGN_CENTRE,
+		newSimulationRightp3prompt
+	);
+	al_draw_ustr(screenOptionsFont,
+		screenOptionsColour,
+		SCREENWIDTH*0.8,
+		SCREENHEIGHT*0.4,
+		ALLEGRO_ALIGN_CENTRE,
+		newSimulationRightp3value
+	);
+	al_draw_ustr(screenOptionsFont,
+		screenOptionsColour,
+		SCREENWIDTH*0.6,
+		SCREENHEIGHT*0.5,
+		ALLEGRO_ALIGN_CENTRE,
+		newSimulationRightp4prompt
+	);
+	al_draw_ustr(screenOptionsFont,
+		screenOptionsColour,
+		SCREENWIDTH*0.8,
+		SCREENHEIGHT*0.5,
+		ALLEGRO_ALIGN_CENTRE,
+		newSimulationRightp4value
+	);
+	al_draw_ustr(screenOptionsFont,
+		screenOptionsColour,
+		SCREENWIDTH*0.6,
+		SCREENHEIGHT*0.6,
+		ALLEGRO_ALIGN_CENTRE,
+		newSimulationRightp5prompt
+	);
+	al_draw_ustr(screenOptionsFont,
+		screenOptionsColour,
+		SCREENWIDTH*0.8,
+		SCREENHEIGHT*0.6,
+		ALLEGRO_ALIGN_CENTRE,
+		newSimulationRightp5value
+	);
+	al_draw_ustr(screenOptionsFont,
+		screenOptionsColour,
+		SCREENWIDTH*0.6,
+		SCREENHEIGHT*0.7,
+		ALLEGRO_ALIGN_CENTRE,
+		newSimulationRightp6prompt
+	);
+	al_draw_ustr(screenOptionsFont,
+		screenOptionsColour,
+		SCREENWIDTH*0.8,
+		SCREENHEIGHT*0.7,
+		ALLEGRO_ALIGN_CENTRE,
+		newSimulationRightp6value
+	);
+	al_draw_ustr(screenOptionsFont,
+		screenOptionsColour,
+		SCREENWIDTH*0.6,
+		SCREENHEIGHT*0.8,
+		ALLEGRO_ALIGN_CENTRE,
+		newSimulationRightp7prompt
+	);
+	al_draw_ustr(screenOptionsFont,
+		screenOptionsColour,
+		SCREENWIDTH*0.8,
+		SCREENHEIGHT*0.8,
+		ALLEGRO_ALIGN_CENTRE,
+		newSimulationRightp7value
+	);
+	//Horizontal Bar
+	al_draw_rectangle(
+		0,
+		SCREENHEIGHT*0.903,
+		SCREENWIDTH,
+		SCREENHEIGHT*0.907,
+		screenOptionsColour,
+		7
+	);
     al_draw_ustr(screenOptionsFont,
         screenOptionsColour,
-        screenWidth*0.5,
-        screenHeight*0.85,
+        SCREENWIDTH*0.5,
+        SCREENHEIGHT*0.9,
         ALLEGRO_ALIGN_CENTRE,
         newSimulationGoBackString
     );
-    drawTriangle(float(screenWidth)*0.4, float(screenHeight)*0.885, 1, screenOptionsColour);
-    drawTriangle(float(screenWidth)*0.6, float(screenHeight)*0.885, -1, screenOptionsColour);
+    drawTriangle(float(SCREENWIDTH)*0.49, float(SCREENHEIGHT)*0.235, -1, screenOptionsColour);
     al_flip_display();
 }
 
 int normalizeNewSimulationScreenIndex(int abnormalIndex) {
-    return abs(abnormalIndex) % newSimulationScreenMenuItems;
+	return normalizeScreenIndex(abnormalIndex, newSimulationScreenMenuItems);
+}
+
+void moveNewSimulationScreenDown(int currentMenuIndex) {
+	drawNewSimulationScreenWithSelection(currentMenuIndex, currentMenuIndex + 1);
+}
+
+void moveNewSimulationScreenUp(int currentMenuIndex) {
+	drawNewSimulationScreenWithSelection(currentMenuIndex, currentMenuIndex - 1);
+}
+
+void drawNewSimulationScreenWithSelection(int previousSelection, int newSelection) {
+	//These are in format leftTriangleX1, triangleY, rightTriangleX1
+	float newSimulationScreenArrows[][3] = {
+		{ float(SCREENWIDTH)*0.49, float(SCREENHEIGHT)*0.235, 0},
+		{ float(SCREENWIDTH)*0.49, float(SCREENHEIGHT)*0.335, 0},
+		{ float(SCREENWIDTH)*0.49, float(SCREENHEIGHT)*0.435, 0},
+		{ float(SCREENWIDTH)*0.49, float(SCREENHEIGHT)*0.535, 0},
+		{ float(SCREENWIDTH)*0.49, float(SCREENHEIGHT)*0.635, 0},
+		{ float(SCREENWIDTH)*0.49, float(SCREENHEIGHT)*0.735, 0},
+		{ float(SCREENWIDTH)*0.49, float(SCREENHEIGHT)*0.835, 0},
+		{ float(SCREENWIDTH)*0.99, float(SCREENHEIGHT)*0.235, 0},
+		{ float(SCREENWIDTH)*0.99, float(SCREENHEIGHT)*0.335, 0},
+		{ float(SCREENWIDTH)*0.99, float(SCREENHEIGHT)*0.435, 0},
+		{ float(SCREENWIDTH)*0.99, float(SCREENHEIGHT)*0.535, 0},
+		{ float(SCREENWIDTH)*0.99, float(SCREENHEIGHT)*0.635, 0},
+		{ float(SCREENWIDTH)*0.99, float(SCREENHEIGHT)*0.735, 0},
+		{ float(SCREENWIDTH)*0.99, float(SCREENHEIGHT)*0.835, 0},
+		{ float(SCREENWIDTH)*0.4, float(SCREENHEIGHT)*0.935, float(SCREENWIDTH)*0.6}
+	};
+
+	previousSelection = normalizeNewSimulationScreenIndex(previousSelection);
+	newSelection = normalizeNewSimulationScreenIndex(newSelection);
+
+	al_flip_display();
+	if (newSelection == newSimulationScreenMenuItems-1) {
+		drawTriangle(newSimulationScreenArrows[previousSelection][0], newSimulationScreenArrows[previousSelection][1], -1, screenBackgroundColour);
+		drawTriangle(newSimulationScreenArrows[newSelection][0], newSimulationScreenArrows[newSelection][1], 1, screenOptionsColour);
+		drawTriangle(newSimulationScreenArrows[newSelection][2], newSimulationScreenArrows[newSelection][1], -1, screenOptionsColour);
+	}
+	else if (previousSelection == newSimulationScreenMenuItems-1) {
+		drawTriangle(newSimulationScreenArrows[previousSelection][0], newSimulationScreenArrows[previousSelection][1], 1, screenBackgroundColour);
+		drawTriangle(newSimulationScreenArrows[previousSelection][2], newSimulationScreenArrows[previousSelection][1], -1, screenBackgroundColour);
+		drawTriangle(newSimulationScreenArrows[newSelection][0], newSimulationScreenArrows[newSelection][1], -1, screenOptionsColour);
+	}
+	else {
+		drawTriangle(newSimulationScreenArrows[previousSelection][0], newSimulationScreenArrows[previousSelection][1], -1, screenBackgroundColour);
+		drawTriangle(newSimulationScreenArrows[newSelection][0], newSimulationScreenArrows[newSelection][1], -1, screenOptionsColour);
+	}
+	al_flip_display();
 }
 
 //Load Simulation Screen Functions
@@ -467,40 +840,50 @@ void setupLoadSimulationScreen()
     al_clear_to_color(screenBackgroundColour);
     al_draw_ustr(screenTitleFont,
         screenOptionsColour,
-        screenWidth*0.5,
-        screenHeight*0.005,
+        SCREENWIDTH*0.5,
+        SCREENHEIGHT*0.005,
         ALLEGRO_ALIGN_CENTRE,
         loadSimulationScreenTitle
     );
+	//Horizontal Bar
     al_draw_rectangle(
         0,
-        screenHeight*0.193,
-        screenWidth,
-        screenHeight*0.197,
+        SCREENHEIGHT*0.193,
+        SCREENWIDTH,
+        SCREENHEIGHT*0.197,
         screenOptionsColour,
         7
     );
     al_draw_ustr(screenOptionsFont,
         screenOptionsColour,
-        screenWidth*0.5,
-        screenHeight*0.5,
+        SCREENWIDTH*0.5,
+        SCREENHEIGHT*0.5,
         ALLEGRO_ALIGN_CENTRE,
         loadSimulationStringOne
     );
+	//Horizontal Bar
+	al_draw_rectangle(
+		0,
+		SCREENHEIGHT*0.903,
+		SCREENWIDTH,
+		SCREENHEIGHT*0.907,
+		screenOptionsColour,
+		7
+	);
     al_draw_ustr(screenOptionsFont,
         screenOptionsColour,
-        screenWidth*0.5,
-        screenHeight*0.85,
+        SCREENWIDTH*0.5,
+        SCREENHEIGHT*0.90,
         ALLEGRO_ALIGN_CENTRE,
         loadSimulationGoBackString
     );
-    drawTriangle(float(screenWidth)*0.4, float(screenHeight)*0.885, 1, screenOptionsColour);
-    drawTriangle(float(screenWidth)*0.6, float(screenHeight)*0.885, -1, screenOptionsColour);
+    drawTriangle(float(SCREENWIDTH)*0.4, float(SCREENHEIGHT)*0.935, 1, screenOptionsColour);
+    drawTriangle(float(SCREENWIDTH)*0.6, float(SCREENHEIGHT)*0.935, -1, screenOptionsColour);
     al_flip_display();
 }
 
 int normalizeLoadSimulationScreenIndex(int abnormalIndex) {
-    return abs(abnormalIndex) % loadSimulationScreenMenuItems;
+	return normalizeScreenIndex(abnormalIndex, loadSimulationScreenMenuItems);
 }
 
 //Options Screen Functions
@@ -509,63 +892,73 @@ void setupOptionsScreen()
     al_clear_to_color(screenBackgroundColour);
     al_draw_ustr(screenTitleFont,
         screenOptionsColour,
-        screenWidth*0.5,
-        screenHeight*0.005,
+        SCREENWIDTH*0.5,
+        SCREENHEIGHT*0.005,
         ALLEGRO_ALIGN_CENTRE,
         optionsScreenTitle
     );
+	//Horizontal Bar
     al_draw_rectangle(
         0,
-        screenHeight*0.193,
-        screenWidth,
-        screenHeight*0.197,
+        SCREENHEIGHT*0.193,
+        SCREENWIDTH,
+        SCREENHEIGHT*0.197,
         screenOptionsColour,
         7
     );
     al_draw_ustr(screenOptionsSmallFont,
         screenOptionsColour,
-        screenWidth*0.005,
-        screenHeight*0.2,
+        SCREENWIDTH*0.005,
+        SCREENHEIGHT*0.2,
         ALLEGRO_ALIGN_LEFT,
         optionsStringOne
     );
     al_draw_ustr(screenOptionsSmallFont,
         screenOptionsColour,
-        screenWidth*0.005,
-        screenHeight*0.28,
+        SCREENWIDTH*0.005,
+        SCREENHEIGHT*0.28,
         ALLEGRO_ALIGN_LEFT,
         optionsStringTwo
     );
     al_draw_ustr(screenOptionsSmallFont,
         screenOptionsColour,
-        screenWidth*0.005,
-        screenHeight*0.36,
+        SCREENWIDTH*0.005,
+        SCREENHEIGHT*0.36,
         ALLEGRO_ALIGN_LEFT,
         optionsStringThree
     );
     al_draw_ustr(screenOptionsSmallFont,
         screenOptionsColour,
-        screenWidth*0.005,
-        screenHeight*0.44,
+        SCREENWIDTH*0.005,
+        SCREENHEIGHT*0.44,
         ALLEGRO_ALIGN_LEFT,
         optionsStringFour
     );
     al_draw_ustr(screenOptionsSmallFont,
         screenOptionsColour,
-        screenWidth*0.005,
-        screenHeight*0.52,
+        SCREENWIDTH*0.005,
+        SCREENHEIGHT*0.52,
         ALLEGRO_ALIGN_LEFT,
         optionsStringFive
     );
+	//Horizontal Bar
+	al_draw_rectangle(
+		0,
+		SCREENHEIGHT*0.903,
+		SCREENWIDTH,
+		SCREENHEIGHT*0.907,
+		screenOptionsColour,
+		7
+	);
     al_draw_ustr(screenOptionsFont,
         screenOptionsColour,
-        screenWidth*0.5,
-        screenHeight*0.85,
+        SCREENWIDTH*0.5,
+        SCREENHEIGHT*0.9,
         ALLEGRO_ALIGN_CENTRE,
         optionsGoBackString
     );
-    drawTriangle(float(screenWidth)*0.4, float(screenHeight)*0.885, 1, screenOptionsColour);
-    drawTriangle(float(screenWidth)*0.6, float(screenHeight)*0.885, -1, screenOptionsColour);
+    drawTriangle(float(SCREENWIDTH)*0.4, float(SCREENHEIGHT)*0.935, 1, screenOptionsColour);
+    drawTriangle(float(SCREENWIDTH)*0.6, float(SCREENHEIGHT)*0.935, -1, screenOptionsColour);
     al_flip_display();
 }
 
@@ -575,64 +968,72 @@ void setupCreditsScreen()
     al_clear_to_color(screenBackgroundColour);
     al_draw_ustr(screenTitleFont,
         screenOptionsColour,
-        screenWidth*0.5,
-        screenHeight*0.005,
+        SCREENWIDTH*0.5,
+        SCREENHEIGHT*0.005,
         ALLEGRO_ALIGN_CENTRE,
         creditsScreenTitle
     );
+	//Horizontal Bar
     al_draw_rectangle(
         0,
-        screenHeight*0.193,
-        screenWidth,
-        screenHeight*0.197,
+        SCREENHEIGHT*0.193,
+        SCREENWIDTH,
+        SCREENHEIGHT*0.197,
         screenOptionsColour,
         7
     );
     al_draw_ustr(screenOptionsSmallFont,
         screenOptionsColour,
-        screenWidth*0.005,
-        screenHeight*0.2,
+        SCREENWIDTH*0.005,
+        SCREENHEIGHT*0.2,
         ALLEGRO_ALIGN_LEFT,
         creditsStringOne
     );
     al_draw_ustr(screenOptionsSmallFont,
         screenOptionsColour,
-        screenWidth*0.005,
-        screenHeight*0.28,
+        SCREENWIDTH*0.005,
+        SCREENHEIGHT*0.28,
         ALLEGRO_ALIGN_LEFT,
         creditsStringTwo
     );
     al_draw_ustr(screenOptionsSmallFont,
         screenOptionsColour,
-        screenWidth*0.005,
-        screenHeight*0.36,
+        SCREENWIDTH*0.005,
+        SCREENHEIGHT*0.36,
         ALLEGRO_ALIGN_LEFT,
         creditsStringThree
     );
     al_draw_ustr(screenOptionsFont,
         screenOptionsColour,
-        screenWidth*0.5,
-        screenHeight*0.70,
+        SCREENWIDTH*0.5,
+        SCREENHEIGHT*0.70,
         ALLEGRO_ALIGN_CENTRE,
         creditsStringFour
     );
+	//Horizontal Bar
+	al_draw_rectangle(
+		0,
+		SCREENHEIGHT*0.903,
+		SCREENWIDTH,
+		SCREENHEIGHT*0.907,
+		screenOptionsColour,
+		7
+	);
     al_draw_ustr(screenOptionsFont,
         screenOptionsColour,
-        screenWidth*0.5,
-        screenHeight*0.85,
+        SCREENWIDTH*0.5,
+        SCREENHEIGHT*0.9,
         ALLEGRO_ALIGN_CENTRE,
         creditsGoBackString
     );
-    drawTriangle(float(screenWidth)*0.4, float(screenHeight)*0.885, 1, screenOptionsColour);
-    drawTriangle(float(screenWidth)*0.6, float(screenHeight)*0.885, -1, screenOptionsColour);
+    drawTriangle(float(SCREENWIDTH)*0.4, float(SCREENHEIGHT)*0.935, 1, screenOptionsColour);
+    drawTriangle(float(SCREENWIDTH)*0.6, float(SCREENHEIGHT)*0.935, -1, screenOptionsColour);
     al_flip_display();
 }
 
 //Initialization Functions
 int initAddons() {
-
 	const char * fontPath = "assets\\testFont.ttf";
-
     if (!al_init() && !al_init_font_addon() && !al_install_keyboard()) {
         cout << "failed to initialize allegro!" << endl;
         return -1;
@@ -653,50 +1054,40 @@ int initAddons() {
         cout << "failed to initialize the primitives addon!" << endl;
         return -1;
     }
-    settingsDisplay = al_create_display(1280, 720);
+    settingsDisplay = al_create_display(SCREENWIDTH, SCREENHEIGHT);
     if (!settingsDisplay) {
         cout << "failed to create display!" << endl;
         return -1;
     }
-
-    screenOptionsFont = al_load_ttf_font(fontPath, 50, 0);
+    screenOptionsFont = al_load_ttf_font(fontPath, SCREENWIDTH / 25.6, 0);
     if (!screenOptionsFont) {
         cout << "Could not load \"testFont.ttf\"" << endl;
         cout << "Make sure the correct font is in the executable location!" << endl;
         screenOptionsFont = al_create_builtin_font();
     }
-
-    screenOptionsSmallFont = al_load_ttf_font(fontPath, 35, 0);
+    screenOptionsSmallFont = al_load_ttf_font(fontPath, SCREENWIDTH / 36.6, 0);
     if (!screenOptionsSmallFont) {
         cout << "Could not load \"testFont.ttf\"" << endl;
         cout << "Make sure the correct font is in the executable location!" << endl;
         screenOptionsSmallFont = al_create_builtin_font();
     }
-
-    screenTitleFont = al_load_ttf_font(fontPath, 108, 0);
+    screenTitleFont = al_load_ttf_font(fontPath, SCREENWIDTH / 12.8, 0);
     if (!screenTitleFont) {
         cout << "Could not load \"testFont.ttf\"" << endl;
         cout << "Make sure the correct font is in the executable location!" << endl;
         screenTitleFont = al_create_builtin_font();
     }
-
     mainEventQueue = al_create_event_queue();
     al_register_event_source(mainEventQueue, al_get_display_event_source(settingsDisplay));
     al_register_event_source(mainEventQueue, al_get_keyboard_event_source());
-    screenHeight = al_get_display_height(settingsDisplay);
-    screenWidth = al_get_display_width(settingsDisplay);
     al_set_window_title(mainDisplay, "Project Psi Launcher");
 }
 
 //List of Bugs to track down
-    //Sometimes when navigating through the menus, the up/down arrow keys will swap directional functionalities
-        //To replicate: Go into and out of menus a bunch and press the up/down arrows
-        //This seems to happen with negative values, probably just doing a check wrong
 
 //Todo in the future
     //Get the menu system working with the mouse as well, for now keyboard controls will have to work
-    //Figure out how to load in fonts from the Resource Files location isntead of the main menu
     //Setup the new simulation menu
-    //setup the load simulation menu
-    //setup the options menu
-    //setup the credits menu
+		//Have the placeholders in place and the ability to maneuver through the menu in place, just have to figure out how to actually udpate the text
+			//I think we might have to undraw the previous version of the text, update the allegro string, and redraw the new version of the text.
+			//I'm looking into a faster way because that is seemingly pretty slow and i'd like to make this as fast as possible, but outside of hte menu system speed will not come with our graphics rendering probably.
