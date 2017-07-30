@@ -107,6 +107,26 @@ tuple<ALLEGRO_USTR,ALLEGRO_USTR> allNewSimulationScreenOptions[newSimulationScre
 	make_tuple(*newSimulationRightp7prompt, *newSimulationRightp7value),
 	make_tuple(*newSimulationGoBackString, *newSimulationGoBackString)
 }; //add new menu options to this array, make sure to increment maxMenuItems, so far this is just for us to keep track of them
+tuple<float, float>allNewSimulationScreenPositions[newSimulationScreenMenuItems] = {
+	make_tuple(0.2, 0.2),
+	make_tuple(0.2, 0.3),
+	make_tuple(0.2, 0.4),
+	make_tuple(0.2, 0.5),
+	make_tuple(0.2, 0.6),
+	make_tuple(0.2, 0.7),
+	make_tuple(0.2, 0.8),
+	make_tuple(0.7, 0.2),
+	make_tuple(0.7, 0.3),
+	make_tuple(0.7, 0.4),
+	make_tuple(0.7, 0.5),
+	make_tuple(0.7, 0.6),
+	make_tuple(0.7, 0.7),
+	make_tuple(0.7, 0.8),
+	make_tuple(0.475, 1)
+};//this is the format of width position/height position
+//these are the positions corresponding to the values of the above tuples, only the values not the prompts.
+//We need to find a better way to do this
+//Note: the last one maps to the middle and the far right
 
 //Load Simulation Screen Variables
 ALLEGRO_USTR *loadSimulationScreenTitle = al_ustr_new("Load Simulation");
@@ -180,6 +200,8 @@ int normalizeNewSimulationScreenIndex(int);
 void moveNewSimulationScreenDown(int);
 void moveNewSimulationScreenUp(int);
 void drawNewSimulationScreenWithSelection(int, int);
+void updateNewSimulationScreenString(int, char);
+void removeCharFromNewSimluationScreenString(int);
 
 //Load Simulation Functions
 void setupLoadSimulationScreen();
@@ -213,7 +235,7 @@ int main(int argc, char **argv) {
 			case ALLEGRO_EVENT_DISPLAY_CLOSE: //This triggers when you hit the x on the window
 				quit = true;
 				break;
-			case ALLEGRO_EVENT_KEY_DOWN:
+			case ALLEGRO_EVENT_KEY_CHAR:
 				switch (event.keyboard.keycode) {
 				case ALLEGRO_KEY_BACKSPACE:
 					if (currentMenu == "Title Screen") {
@@ -320,7 +342,7 @@ int main(int argc, char **argv) {
 		}
 		 else {
 			 switch (event.type) {
-			 case ALLEGRO_EVENT_KEY_DOWN:
+			 case ALLEGRO_EVENT_KEY_CHAR:
 				 switch (event.keyboard.keycode) {
 				 case ALLEGRO_KEY_ENTER:
 					 valueInputMode = false;
@@ -330,15 +352,14 @@ int main(int argc, char **argv) {
 					 break;
 				 case ALLEGRO_KEY_BACKSPACE:
 					 if (currentMenu == "New Simulation") {
-						 auto manipulationTuple = allNewSimulationScreenOptions[normalizeNewSimulationScreenIndex(currentMenuIndex)];
-						 al_ustr_remove_chr(&get<1>(manipulationTuple), al_ustr_length(&get<1>(manipulationTuple)) - 1);
-						 cout << "Removing the last character" << endl;
+						 removeCharFromNewSimluationScreenString(currentMenuIndex);
 					 }
 					 break;
 				 default:
 					 if (currentMenu == "New Simulation") {
-						 cout << "appending character: " << event.keyboard.keycode << endl;
+						 updateNewSimulationScreenString(currentMenuIndex, event.keyboard.unichar);
 					 }
+					 break;
 				 }
 			 }
 		}
@@ -573,9 +594,9 @@ void setupNewSimulationScreen() {
 	);
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
-		SCREENWIDTH*0.3,
+		SCREENWIDTH*0.2,
 		SCREENHEIGHT*0.2,
-		ALLEGRO_ALIGN_CENTRE,
+		ALLEGRO_ALIGN_LEFT,
 		newSimulationLeftp1value
 	);
 	al_draw_ustr(screenOptionsFont,
@@ -587,9 +608,9 @@ void setupNewSimulationScreen() {
 	);
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
-		SCREENWIDTH*0.3,
+		SCREENWIDTH*0.2,
 		SCREENHEIGHT*0.3,
-		ALLEGRO_ALIGN_CENTRE,
+		ALLEGRO_ALIGN_LEFT,
 		newSimulationLeftp2value
 	);
 	al_draw_ustr(screenOptionsFont,
@@ -601,9 +622,9 @@ void setupNewSimulationScreen() {
 	);
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
-		SCREENWIDTH*0.3,
+		SCREENWIDTH*0.2,
 		SCREENHEIGHT*0.4,
-		ALLEGRO_ALIGN_CENTRE,
+		ALLEGRO_ALIGN_LEFT,
 		newSimulationLeftp3value
 	);
 	al_draw_ustr(screenOptionsFont,
@@ -615,9 +636,9 @@ void setupNewSimulationScreen() {
 	);
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
-		SCREENWIDTH*0.3,
+		SCREENWIDTH*0.2,
 		SCREENHEIGHT*0.5,
-		ALLEGRO_ALIGN_CENTRE,
+		ALLEGRO_ALIGN_LEFT,
 		newSimulationLeftp4value
 	);
 	al_draw_ustr(screenOptionsFont,
@@ -629,9 +650,9 @@ void setupNewSimulationScreen() {
 	);
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
-		SCREENWIDTH*0.3,
+		SCREENWIDTH*0.2,
 		SCREENHEIGHT*0.6,
-		ALLEGRO_ALIGN_CENTRE,
+		ALLEGRO_ALIGN_LEFT,
 		newSimulationLeftp5value
 	);
 	al_draw_ustr(screenOptionsFont,
@@ -643,9 +664,9 @@ void setupNewSimulationScreen() {
 	);
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
-		SCREENWIDTH*0.3,
+		SCREENWIDTH*0.2,
 		SCREENHEIGHT*0.7,
-		ALLEGRO_ALIGN_CENTRE,
+		ALLEGRO_ALIGN_LEFT,
 		newSimulationLeftp6value
 	);
 	al_draw_ustr(screenOptionsFont,
@@ -657,9 +678,9 @@ void setupNewSimulationScreen() {
 	);
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
-		SCREENWIDTH*0.3,
+		SCREENWIDTH*0.2,
 		SCREENHEIGHT*0.8,
-		ALLEGRO_ALIGN_CENTRE,
+		ALLEGRO_ALIGN_LEFT,
 		newSimulationLeftp7value
 	);
 	//Righthand Side Options
@@ -672,9 +693,9 @@ void setupNewSimulationScreen() {
 	);
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
-		SCREENWIDTH*0.8,
+		SCREENWIDTH*0.7,
 		SCREENHEIGHT*0.2,
-		ALLEGRO_ALIGN_CENTRE,
+		ALLEGRO_ALIGN_LEFT,
 		newSimulationRightp1value
 	);
 	al_draw_ustr(screenOptionsFont,
@@ -686,9 +707,9 @@ void setupNewSimulationScreen() {
 	);
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
-		SCREENWIDTH*0.8,
+		SCREENWIDTH*0.7,
 		SCREENHEIGHT*0.3,
-		ALLEGRO_ALIGN_CENTRE,
+		ALLEGRO_ALIGN_LEFT,
 		newSimulationRightp2value
 	);
 	al_draw_ustr(screenOptionsFont,
@@ -700,9 +721,9 @@ void setupNewSimulationScreen() {
 	);
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
-		SCREENWIDTH*0.8,
+		SCREENWIDTH*0.7,
 		SCREENHEIGHT*0.4,
-		ALLEGRO_ALIGN_CENTRE,
+		ALLEGRO_ALIGN_LEFT,
 		newSimulationRightp3value
 	);
 	al_draw_ustr(screenOptionsFont,
@@ -714,9 +735,9 @@ void setupNewSimulationScreen() {
 	);
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
-		SCREENWIDTH*0.8,
+		SCREENWIDTH*0.7,
 		SCREENHEIGHT*0.5,
-		ALLEGRO_ALIGN_CENTRE,
+		ALLEGRO_ALIGN_LEFT,
 		newSimulationRightp4value
 	);
 	al_draw_ustr(screenOptionsFont,
@@ -728,9 +749,9 @@ void setupNewSimulationScreen() {
 	);
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
-		SCREENWIDTH*0.8,
+		SCREENWIDTH*0.7,
 		SCREENHEIGHT*0.6,
-		ALLEGRO_ALIGN_CENTRE,
+		ALLEGRO_ALIGN_LEFT,
 		newSimulationRightp5value
 	);
 	al_draw_ustr(screenOptionsFont,
@@ -742,9 +763,9 @@ void setupNewSimulationScreen() {
 	);
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
-		SCREENWIDTH*0.8,
+		SCREENWIDTH*0.7,
 		SCREENHEIGHT*0.7,
-		ALLEGRO_ALIGN_CENTRE,
+		ALLEGRO_ALIGN_LEFT,
 		newSimulationRightp6value
 	);
 	al_draw_ustr(screenOptionsFont,
@@ -756,9 +777,9 @@ void setupNewSimulationScreen() {
 	);
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
-		SCREENWIDTH*0.8,
+		SCREENWIDTH*0.7,
 		SCREENHEIGHT*0.8,
-		ALLEGRO_ALIGN_CENTRE,
+		ALLEGRO_ALIGN_LEFT,
 		newSimulationRightp7value
 	);
 	//Horizontal Bar
@@ -833,6 +854,69 @@ void drawNewSimulationScreenWithSelection(int previousSelection, int newSelectio
 	}
 	al_flip_display();
 }
+
+void updateNewSimulationScreenString(int currentMenuItemIndex, char updateChar) {
+	currentMenuItemIndex = normalizeNewSimulationScreenIndex(currentMenuItemIndex);
+	auto screenItem = allNewSimulationScreenOptions[currentMenuItemIndex];
+	auto screenPositions = allNewSimulationScreenPositions[currentMenuItemIndex];
+	int rectangleEndPosition = 0;
+	if (currentMenuItemIndex > 0 || currentMenuItemIndex < 8) {
+		rectangleEndPosition = SCREENWIDTH * 0.45;
+	}
+	else {
+		rectangleEndPosition = SCREENWIDTH;
+	}
+	al_flip_display();
+	al_draw_filled_rectangle(
+		SCREENWIDTH * (get<0>(screenPositions)),
+		SCREENHEIGHT * (get<1>(screenPositions) + 0.015),
+		rectangleEndPosition,
+		SCREENHEIGHT * (get<1>(screenPositions) + 0.095),
+		screenBackgroundColour
+	);
+	al_ustr_append_chr(&get<1>(screenItem), updateChar);
+	al_draw_ustr(screenOptionsFont,
+		screenOptionsColour,
+		SCREENWIDTH * get<0>(screenPositions),
+		SCREENHEIGHT * get<1>(screenPositions),
+		ALLEGRO_ALIGN_LEFT,
+		&get<1>(screenItem)
+	);
+	al_flip_display();
+	get<1>(allNewSimulationScreenOptions[currentMenuItemIndex]) = get<1>(screenItem);
+}
+
+void removeCharFromNewSimluationScreenString(int currentMenuItemIndex) {
+	currentMenuItemIndex = normalizeNewSimulationScreenIndex(currentMenuItemIndex);
+	auto screenItem = allNewSimulationScreenOptions[currentMenuItemIndex];
+	auto screenPositions = allNewSimulationScreenPositions[currentMenuItemIndex];
+	int rectangleEndPosition = 0;
+	if (currentMenuItemIndex > 0 || currentMenuItemIndex < 8) {
+		rectangleEndPosition = SCREENWIDTH * 0.45;
+	}
+	else {
+		rectangleEndPosition = SCREENWIDTH;
+	}
+	al_flip_display();
+	al_draw_filled_rectangle(
+		SCREENWIDTH * (get<0>(screenPositions)),
+		SCREENHEIGHT * (get<1>(screenPositions) + 0.015),
+		rectangleEndPosition,
+		SCREENHEIGHT * (get<1>(screenPositions) + 0.095),
+		screenBackgroundColour
+	);
+	al_ustr_remove_chr(&get<1>(screenItem), al_ustr_offset(&get<1>(screenItem), al_ustr_length(&get<1>(screenItem))-1));
+	al_draw_ustr(screenOptionsFont,
+		screenOptionsColour,
+		SCREENWIDTH * get<0>(screenPositions),
+		SCREENHEIGHT * get<1>(screenPositions),
+		ALLEGRO_ALIGN_LEFT,
+		&get<1>(screenItem)
+	);
+	al_flip_display();
+	get<1>(allNewSimulationScreenOptions[currentMenuItemIndex]) = get<1>(screenItem);
+}
+
 
 //Load Simulation Screen Functions
 void setupLoadSimulationScreen()
@@ -1088,6 +1172,6 @@ int initAddons() {
 //Todo in the future
     //Get the menu system working with the mouse as well, for now keyboard controls will have to work
     //Setup the new simulation menu
-		//Have the placeholders in place and the ability to maneuver through the menu in place, just have to figure out how to actually udpate the text
-			//I think we might have to undraw the previous version of the text, update the allegro string, and redraw the new version of the text.
-			//I'm looking into a faster way because that is seemingly pretty slow and i'd like to make this as fast as possible, but outside of hte menu system speed will not come with our graphics rendering probably.
+		//Still need to parse the values from the ustr values.
+		//Also need to make sure that the strings don't excede a maximum length visible
+			//This means this display will overflow, its hard to draw text on a screen it turns out
