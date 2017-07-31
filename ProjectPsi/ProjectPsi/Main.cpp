@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string>
 #include <iostream>
+#include <fstream>
 #include <cmath>
 #include <tuple>
 
@@ -27,20 +28,21 @@ static const int SCREENWIDTH = 1280;
 static const int SCREENHEIGHT = 720;
 
 //Variables used to initialize the simulation
-string leftValue1;
-string leftValue2;
-string leftValue3;
-string leftValue4;
-string leftValue5;
-string leftValue6;
-string leftValue7;
-string rightValue1;
-string rightValue2;
-string rightValue3;
-string rightValue4;
-string rightValue5;
-string rightValue6;
-string rightValue7;
+char * leftValue1 = "";
+char * leftValue2 = "";
+char * leftValue3 = "";
+char * leftValue4 = "";
+char * leftValue5 = "";
+char * leftValue6 = "";
+char * leftValue7 = "";
+char * rightValue1 = "";
+char * rightValue2 = "";
+char * rightValue3 = "";
+char * rightValue4 = "";
+char * rightValue5 = "";
+char * rightValue6 = "";
+char * rightValue7 = "";
+char * testing = "PLACEHOLDER VALUE";
 
 //Title Screen Variables
 ALLEGRO_USTR *mainMenuScreenTitle = al_ustr_new("Project Psi");
@@ -67,13 +69,13 @@ ALLEGRO_USTR *newSimulationLeftp4prompt = al_ustr_new("Placeholder:");
 ALLEGRO_USTR *newSimulationLeftp5prompt = al_ustr_new("Placeholder:");
 ALLEGRO_USTR *newSimulationLeftp6prompt = al_ustr_new("Placeholder:");
 ALLEGRO_USTR *newSimulationLeftp7prompt = al_ustr_new("Placeholder:");
-ALLEGRO_USTR *newSimulationLeftp1value = al_ustr_new("Value");
-ALLEGRO_USTR *newSimulationLeftp2value = al_ustr_new("Value");
-ALLEGRO_USTR *newSimulationLeftp3value = al_ustr_new("Value");
-ALLEGRO_USTR *newSimulationLeftp4value = al_ustr_new("Value");
-ALLEGRO_USTR *newSimulationLeftp5value = al_ustr_new("Value");
-ALLEGRO_USTR *newSimulationLeftp6value = al_ustr_new("Value");
-ALLEGRO_USTR *newSimulationLeftp7value = al_ustr_new("Value");
+ALLEGRO_USTR *newSimulationLeftp1value = al_ustr_new(leftValue1);
+ALLEGRO_USTR *newSimulationLeftp2value = al_ustr_new(leftValue2);
+ALLEGRO_USTR *newSimulationLeftp3value = al_ustr_new(leftValue3);
+ALLEGRO_USTR *newSimulationLeftp4value = al_ustr_new(leftValue4);
+ALLEGRO_USTR *newSimulationLeftp5value = al_ustr_new(leftValue5);
+ALLEGRO_USTR *newSimulationLeftp6value = al_ustr_new(leftValue6);
+ALLEGRO_USTR *newSimulationLeftp7value = al_ustr_new(leftValue7);
 ALLEGRO_USTR *newSimulationRightp1prompt = al_ustr_new("Placeholder:");
 ALLEGRO_USTR *newSimulationRightp2prompt = al_ustr_new("Placeholder:");
 ALLEGRO_USTR *newSimulationRightp3prompt = al_ustr_new("Placeholder:");
@@ -81,31 +83,35 @@ ALLEGRO_USTR *newSimulationRightp4prompt = al_ustr_new("Placeholder:");
 ALLEGRO_USTR *newSimulationRightp5prompt = al_ustr_new("Placeholder:");
 ALLEGRO_USTR *newSimulationRightp6prompt = al_ustr_new("Placeholder:");
 ALLEGRO_USTR *newSimulationRightp7prompt = al_ustr_new("Placeholder:");
-ALLEGRO_USTR *newSimulationRightp1value = al_ustr_new("Value");
-ALLEGRO_USTR *newSimulationRightp2value = al_ustr_new("Value");
-ALLEGRO_USTR *newSimulationRightp3value = al_ustr_new("Value");
-ALLEGRO_USTR *newSimulationRightp4value = al_ustr_new("Value");
-ALLEGRO_USTR *newSimulationRightp5value = al_ustr_new("Value");
-ALLEGRO_USTR *newSimulationRightp6value = al_ustr_new("Value");
-ALLEGRO_USTR *newSimulationRightp7value = al_ustr_new("Value");
+ALLEGRO_USTR *newSimulationRightp1value = al_ustr_new(rightValue1);
+ALLEGRO_USTR *newSimulationRightp2value = al_ustr_new(rightValue2);
+ALLEGRO_USTR *newSimulationRightp3value = al_ustr_new(rightValue3);
+ALLEGRO_USTR *newSimulationRightp4value = al_ustr_new(rightValue4);
+ALLEGRO_USTR *newSimulationRightp5value = al_ustr_new(rightValue5);
+ALLEGRO_USTR *newSimulationRightp6value = al_ustr_new(rightValue6);
+ALLEGRO_USTR *newSimulationRightp7value = al_ustr_new(rightValue7);
 ALLEGRO_USTR *newSimulationGoBackString = al_ustr_new("Go Back");
-const int newSimulationScreenMenuItems = 15; //Don't count the title in here
-tuple<ALLEGRO_USTR,ALLEGRO_USTR> allNewSimulationScreenOptions[newSimulationScreenMenuItems] = {
-	make_tuple(*newSimulationLeftp1prompt, *newSimulationLeftp1value),
-	make_tuple(*newSimulationLeftp2prompt, *newSimulationLeftp2value),
-	make_tuple(*newSimulationLeftp3prompt, *newSimulationLeftp3value),
-	make_tuple(*newSimulationLeftp4prompt, *newSimulationLeftp4value),
-	make_tuple(*newSimulationLeftp5prompt, *newSimulationLeftp5value),
-	make_tuple(*newSimulationLeftp6prompt, *newSimulationLeftp6value),
-	make_tuple(*newSimulationLeftp7prompt, *newSimulationLeftp7value),
-	make_tuple(*newSimulationRightp1prompt, *newSimulationRightp1value),
-	make_tuple(*newSimulationRightp2prompt, *newSimulationRightp2value),
-	make_tuple(*newSimulationRightp3prompt, *newSimulationRightp3value),
-	make_tuple(*newSimulationRightp4prompt, *newSimulationRightp4value),
-	make_tuple(*newSimulationRightp5prompt, *newSimulationRightp5value),
-	make_tuple(*newSimulationRightp6prompt, *newSimulationRightp6value),
-	make_tuple(*newSimulationRightp7prompt, *newSimulationRightp7value),
-	make_tuple(*newSimulationGoBackString, *newSimulationGoBackString)
+ALLEGRO_USTR *newSimulationStartString = al_ustr_new("Start");
+ALLEGRO_USTR *newSimulationExportConfiguartionString = al_ustr_new("Export");
+const int newSimulationScreenMenuItems = 17; //Don't count the title in here
+tuple<ALLEGRO_USTR,ALLEGRO_USTR, char*> allNewSimulationScreenOptions[newSimulationScreenMenuItems] = {
+	make_tuple(*newSimulationLeftp1prompt, *newSimulationLeftp1value, leftValue1),
+	make_tuple(*newSimulationLeftp2prompt, *newSimulationLeftp2value, leftValue2),
+	make_tuple(*newSimulationLeftp3prompt, *newSimulationLeftp3value, leftValue3),
+	make_tuple(*newSimulationLeftp4prompt, *newSimulationLeftp4value, leftValue4),
+	make_tuple(*newSimulationLeftp5prompt, *newSimulationLeftp5value, leftValue5),
+	make_tuple(*newSimulationLeftp6prompt, *newSimulationLeftp6value, leftValue6),
+	make_tuple(*newSimulationLeftp7prompt, *newSimulationLeftp7value, leftValue7),
+	make_tuple(*newSimulationRightp1prompt, *newSimulationRightp1value, rightValue1),
+	make_tuple(*newSimulationRightp2prompt, *newSimulationRightp2value, rightValue2),
+	make_tuple(*newSimulationRightp3prompt, *newSimulationRightp3value, rightValue3),
+	make_tuple(*newSimulationRightp4prompt, *newSimulationRightp4value, rightValue4),
+	make_tuple(*newSimulationRightp5prompt, *newSimulationRightp5value, rightValue5),
+	make_tuple(*newSimulationRightp6prompt, *newSimulationRightp6value, rightValue6),
+	make_tuple(*newSimulationRightp7prompt, *newSimulationRightp7value, rightValue7),
+	make_tuple(*newSimulationGoBackString, *newSimulationGoBackString, testing),
+	make_tuple(*newSimulationStartString, *newSimulationStartString, testing),
+	make_tuple(*newSimulationExportConfiguartionString, *newSimulationExportConfiguartionString, testing)
 }; //add new menu options to this array, make sure to increment maxMenuItems, so far this is just for us to keep track of them
 tuple<float, float>allNewSimulationScreenPositions[newSimulationScreenMenuItems] = {
 	make_tuple(0.2, 0.2),
@@ -122,11 +128,13 @@ tuple<float, float>allNewSimulationScreenPositions[newSimulationScreenMenuItems]
 	make_tuple(0.7, 0.6),
 	make_tuple(0.7, 0.7),
 	make_tuple(0.7, 0.8),
-	make_tuple(0.475, 1)
+	make_tuple(0.475, 1),
+	make_tuple(0, 0),
+	make_tuple(0, 0)
 };//this is the format of width position/height position
 //these are the positions corresponding to the values of the above tuples, only the values not the prompts.
 //We need to find a better way to do this
-//Note: the last one maps to the middle and the far right
+//Note: the last one maps to the middle and the far right for the purpose of drawing the "black bar"
 
 //Load Simulation Screen Variables
 ALLEGRO_USTR *loadSimulationScreenTitle = al_ustr_new("Load Simulation");
@@ -202,7 +210,8 @@ void moveNewSimulationScreenUp(int);
 void drawNewSimulationScreenWithSelection(int, int);
 void updateNewSimulationScreenString(int, char);
 void removeCharFromNewSimluationScreenString(int);
-
+void processValueText(int);
+void exportSimluationConfiguration();
 //Load Simulation Functions
 void setupLoadSimulationScreen();
 int normalizeLoadSimulationScreenIndex(int);
@@ -345,6 +354,7 @@ int main(int argc, char **argv) {
 			 case ALLEGRO_EVENT_KEY_CHAR:
 				 switch (event.keyboard.keycode) {
 				 case ALLEGRO_KEY_ENTER:
+					 processValueText(currentMenuIndex);
 					 valueInputMode = false;
 					 break;
 				 case ALLEGRO_KEY_ESCAPE:
@@ -407,6 +417,11 @@ tuple<bool, string> processMenu(string currentMenu, int currentMenuIndex) {
         switch (currentMenuIndex) {
         case(14):
             return make_tuple(false, "Title Screen");
+		case(15):
+			exportSimluationConfiguration();
+			return make_tuple(true, "New Simulation");
+		case(16):
+			return make_tuple(true, "Simulation");
 		default: //note, this makes the code smaller to write but it makes the error cases (that shouldn't arise) hard to handle.
 			return make_tuple(true, "New Simulation");
 		}
@@ -567,22 +582,20 @@ void setupNewSimulationScreen() {
         newSimulationScreenTitle
     );
 	//Horizontal Bar
-    al_draw_rectangle(
+	al_draw_filled_rectangle(
         0,
         SCREENHEIGHT*0.193,
         SCREENWIDTH,
         SCREENHEIGHT*0.197,
-        screenOptionsColour,
-        7
+        screenOptionsColour
     );
 	//Vertical Bar
-    al_draw_rectangle(
+	al_draw_filled_rectangle(
         SCREENWIDTH*0.4995,
         SCREENHEIGHT*0.193,
         SCREENWIDTH*0.5005,
         SCREENHEIGHT*0.903,
-        screenOptionsColour,
-        1
+        screenOptionsColour
     );
 	//Lefthand Side Options
 	al_draw_ustr(screenOptionsFont,
@@ -783,14 +796,14 @@ void setupNewSimulationScreen() {
 		newSimulationRightp7value
 	);
 	//Horizontal Bar
-	al_draw_rectangle(
+	al_draw_filled_rectangle(
 		0,
 		SCREENHEIGHT*0.903,
 		SCREENWIDTH,
 		SCREENHEIGHT*0.907,
-		screenOptionsColour,
-		7
+		screenOptionsColour
 	);
+	//Bottom of the screen options
     al_draw_ustr(screenOptionsFont,
         screenOptionsColour,
         SCREENWIDTH*0.5,
@@ -798,6 +811,20 @@ void setupNewSimulationScreen() {
         ALLEGRO_ALIGN_CENTRE,
         newSimulationGoBackString
     );
+	al_draw_ustr(screenOptionsFont,
+		screenOptionsColour,
+		SCREENWIDTH*0.1,
+		SCREENHEIGHT*0.9,
+		ALLEGRO_ALIGN_CENTRE,
+		newSimulationExportConfiguartionString
+	);
+	al_draw_ustr(screenOptionsFont,
+		screenOptionsColour,
+		SCREENWIDTH*0.9,
+		SCREENHEIGHT*0.9,
+		ALLEGRO_ALIGN_CENTRE,
+		newSimulationStartString
+	);
     drawTriangle(float(SCREENWIDTH)*0.49, float(SCREENHEIGHT)*0.235, -1, screenOptionsColour);
     al_flip_display();
 }
@@ -831,19 +858,27 @@ void drawNewSimulationScreenWithSelection(int previousSelection, int newSelectio
 		{ float(SCREENWIDTH)*0.99, float(SCREENHEIGHT)*0.635, 0},
 		{ float(SCREENWIDTH)*0.99, float(SCREENHEIGHT)*0.735, 0},
 		{ float(SCREENWIDTH)*0.99, float(SCREENHEIGHT)*0.835, 0},
-		{ float(SCREENWIDTH)*0.4, float(SCREENHEIGHT)*0.935, float(SCREENWIDTH)*0.6}
+		{ float(SCREENWIDTH)*0.4, float(SCREENHEIGHT)*0.935, float(SCREENWIDTH)*0.6},
+		{ float(SCREENWIDTH)*0.015, float(SCREENHEIGHT)*0.935, float(SCREENWIDTH)*0.185},
+		{ float(SCREENWIDTH)*0.82, float(SCREENHEIGHT)*0.935, float(SCREENWIDTH)*0.98}
 	};
 
 	previousSelection = normalizeNewSimulationScreenIndex(previousSelection);
 	newSelection = normalizeNewSimulationScreenIndex(newSelection);
 
 	al_flip_display();
-	if (newSelection == newSimulationScreenMenuItems-1) {
+	if (newSelection >= 14 && previousSelection >= 14) {
+		drawTriangle(newSimulationScreenArrows[previousSelection][0], newSimulationScreenArrows[previousSelection][1], 1, screenBackgroundColour);
+		drawTriangle(newSimulationScreenArrows[previousSelection][2], newSimulationScreenArrows[previousSelection][1], -1, screenBackgroundColour);
+		drawTriangle(newSimulationScreenArrows[newSelection][0], newSimulationScreenArrows[newSelection][1], 1, screenOptionsColour);
+		drawTriangle(newSimulationScreenArrows[newSelection][2], newSimulationScreenArrows[newSelection][1], -1, screenOptionsColour);
+	}
+	if (newSelection >= 14) {
 		drawTriangle(newSimulationScreenArrows[previousSelection][0], newSimulationScreenArrows[previousSelection][1], -1, screenBackgroundColour);
 		drawTriangle(newSimulationScreenArrows[newSelection][0], newSimulationScreenArrows[newSelection][1], 1, screenOptionsColour);
 		drawTriangle(newSimulationScreenArrows[newSelection][2], newSimulationScreenArrows[newSelection][1], -1, screenOptionsColour);
 	}
-	else if (previousSelection == newSimulationScreenMenuItems-1) {
+	else if (previousSelection >= 14) {
 		drawTriangle(newSimulationScreenArrows[previousSelection][0], newSimulationScreenArrows[previousSelection][1], 1, screenBackgroundColour);
 		drawTriangle(newSimulationScreenArrows[previousSelection][2], newSimulationScreenArrows[previousSelection][1], -1, screenBackgroundColour);
 		drawTriangle(newSimulationScreenArrows[newSelection][0], newSimulationScreenArrows[newSelection][1], -1, screenOptionsColour);
@@ -917,7 +952,53 @@ void removeCharFromNewSimluationScreenString(int currentMenuItemIndex) {
 	get<1>(allNewSimulationScreenOptions[currentMenuItemIndex]) = get<1>(screenItem);
 }
 
+void processValueText(int currentMenuItemIndex) {
+	cout << "Processing the text of menu item: " << normalizeNewSimulationScreenIndex(currentMenuItemIndex) << endl;
+	//This method is called when we are done processing user input text.
+}
 
+void exportSimluationConfiguration() {
+	cout << "Creating a file and exporting the list of rules we have generated" << endl;
+	cout << "\tFile will be named simulationSettingsExport.txt" << endl;
+	ofstream exportFile;
+	exportFile.open("simulationSettingsExport.txt");
+	exportFile << "||===================================================||\n";
+	exportFile << "||     Project Psi Exported Configuration Setting    ||\n";
+	exportFile << "||   Created By Bryton Leason and Samual Horovatin   ||\n";
+	exportFile << "||===================================================||\n";
+	exportFile << "||   Currently this file isn't used for importing    ||\n";
+	exportFile << "|| In the future it will be and this will be removed ||\n";
+	exportFile << "||===================================================||\n\n";
+	exportFile << "//This value is used for something\n";
+	exportFile << "Left Placeholder 1 Value is:  " << leftValue1 << "\n\n";
+	exportFile << "//This value is used for something\n";
+	exportFile << "Left Placeholder 2 Value is:  " << leftValue2 << "\n\n";
+	exportFile << "//This value is used for something\n";
+	exportFile << "Left Placeholder 3 Value is:  " << leftValue3 << "\n\n";
+	exportFile << "//This value is used for something\n";
+	exportFile << "Left Placeholder 4 Value is:  " << leftValue4 << "\n\n";
+	exportFile << "//This value is used for something\n";
+	exportFile << "Left Placeholder 5 Value is:  " << leftValue5 << "\n\n";
+	exportFile << "//This value is used for something\n";
+	exportFile << "Left Placeholder 6 Value is:  " << leftValue6 << "\n\n";
+	exportFile << "//This value is used for something\n";
+	exportFile << "Left Placeholder 7 Value is:  " << leftValue7 << "\n\n";
+	exportFile << "//This value is used for something\n";
+	exportFile << "Right Placeholder 1 Value is: " << rightValue1 << "\n\n";
+	exportFile << "//This value is used for something\n";
+	exportFile << "Right Placeholder 2 Value is: " << rightValue2 << "\n\n";
+	exportFile << "//This value is used for something\n";
+	exportFile << "Right Placeholder 3 Value is: " << rightValue3 << "\n\n";
+	exportFile << "//This value is used for something\n";
+	exportFile << "Right Placeholder 4 Value is: " << rightValue4 << "\n\n";
+	exportFile << "//This value is used for something\n";
+	exportFile << "Right Placeholder 5 Value is: " << rightValue5 << "\n\n";
+	exportFile << "//This value is used for something\n";
+	exportFile << "Right Placeholder 6 Value is: " << rightValue6 << "\n\n";
+	exportFile << "//This value is used for something\n";
+	exportFile << "Right Placeholder 7 Value is: " << rightValue7 << "\n\n";
+	exportFile.close();
+}
 //Load Simulation Screen Functions
 void setupLoadSimulationScreen()
 {
