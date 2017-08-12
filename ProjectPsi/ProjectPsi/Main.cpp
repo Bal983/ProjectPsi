@@ -15,7 +15,6 @@
 //Other includes
 #include "AllegroSettings.h"
 
-
 using namespace std;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -28,20 +27,20 @@ bool quit = false;
 //CHANGE: Moved screen resolution to .h
 
 //Variables used to initialize the simulation
-char * initValues[15] = {""};
+char * initValues[15] = {"\0","\0", "\0", "\0", "\0", "\0", "\0", "\0", "\0", "\0", "\0", "\0", "\0", "\0"};
 
 //Title Screen Variables
 ALLEGRO_USTR *mainMenuScreenTitle = al_ustr_new("Project Psi");
 ALLEGRO_USTR *newSimulationString = al_ustr_new("New Simulation");
 ALLEGRO_USTR *loadSimulationString = al_ustr_new("Load Simulation");
-ALLEGRO_USTR *optionsString = al_ustr_new("Options");
+ALLEGRO_USTR *controlsString = al_ustr_new("Controls");
 ALLEGRO_USTR *creditsString = al_ustr_new("Credits");
 ALLEGRO_USTR *quitString = al_ustr_new("Quit");
 const int titleScreenMenuItems = 5; //Don't count the title in here
 ALLEGRO_USTR *allTitleScreenOptions[titleScreenMenuItems] = {
     newSimulationString,
     loadSimulationString,
-    optionsString,
+	controlsString,
     creditsString,
     quitString
 }; //add new menu options to this array, make sure to increment maxMenuItems, so far this is just for us to keep track of them
@@ -99,7 +98,7 @@ tuple<ALLEGRO_USTR,ALLEGRO_USTR, char*> allNewSimulationScreenOptions[newSimulat
 	make_tuple(*newSimulationStartString, *newSimulationStartString, initValues[14]),
 	make_tuple(*newSimulationExportConfiguartionString, *newSimulationExportConfiguartionString, initValues[14])
 }; //add new menu options to this array, make sure to increment maxMenuItems, so far this is just for us to keep track of them
-tuple<float, float>allNewSimulationScreenPositions[newSimulationScreenMenuItems] = {
+tuple<float, float> allNewSimulationScreenPositions[newSimulationScreenMenuItems] = {
 	make_tuple(0.2, 0.2),
 	make_tuple(0.2, 0.3),
 	make_tuple(0.2, 0.4),
@@ -132,22 +131,22 @@ ALLEGRO_USTR *allLoadSimulationScreenOptions[loadSimulationScreenMenuItems] = {
     loadSimulationStringOne
 }; //add new menu options to this array, make sure to increment maxMenuItems, so far this is just for us to keep track of them
 
-//Options Screen Variables
-ALLEGRO_USTR *optionsScreenTitle = al_ustr_new("Options");
-ALLEGRO_USTR *optionsGoBackString = al_ustr_new("Go Back");
-ALLEGRO_USTR *optionsStringOne = al_ustr_new("Press up arrow or w to move up in the menu");
-ALLEGRO_USTR *optionsStringTwo = al_ustr_new("Press down arrow or s to move down in the menu");
-ALLEGRO_USTR *optionsStringThree = al_ustr_new("Press escape at any time to close the launcher");
-ALLEGRO_USTR *optionsStringFour = al_ustr_new("Press enter at any to confirm your selection");
-ALLEGRO_USTR *optionsStringFive = al_ustr_new("Press backspace to move back in the menu system");
+//Controls Screen Variables
+ALLEGRO_USTR *controlsScreenTitle = al_ustr_new("Options");
+ALLEGRO_USTR *controlsGoBackString = al_ustr_new("Go Back");
+ALLEGRO_USTR *controlsStringOne = al_ustr_new("Press up arrow or w to move up in the menu");
+ALLEGRO_USTR *controlsStringTwo = al_ustr_new("Press down arrow or s to move down in the menu");
+ALLEGRO_USTR *controlsStringThree = al_ustr_new("Press escape at any time to close the launcher");
+ALLEGRO_USTR *controlsStringFour = al_ustr_new("Press enter at any to confirm your selection");
+ALLEGRO_USTR *controlsStringFive = al_ustr_new("Press backspace to move back in the menu system");
 const int optionsScreenMenuItems = 6; //Don't count the title in here
 ALLEGRO_USTR *allOptionsScreenOptions[optionsScreenMenuItems] = {
-    optionsGoBackString,
-    optionsStringOne,
-    optionsStringTwo,
-    optionsStringThree,
-    optionsStringFour,
-    optionsStringFive
+	controlsGoBackString,
+	controlsStringOne,
+	controlsStringTwo,
+	controlsStringThree,
+	controlsStringFour,
+	controlsStringFive
 }; //add new menu options to this array, make sure to increment maxMenuItems, so far this is just for us to keep track of them
 
 //Credits Screen Variables
@@ -202,8 +201,8 @@ void exportSimluationConfiguration();
 void setupLoadSimulationScreen();
 int normalizeLoadSimulationScreenIndex(int);
 
-//Options Functions
-void setupOptionsScreen();
+//Controls Functions
+void setupControlsScreen();
 
 //Credits Functions
 void setupCreditsScreen();
@@ -269,8 +268,8 @@ int main(int argc, char **argv) {
 						currentMenu = get<1>(response);
 						currentMenuIndex = 0;
 					}
-					else if (currentMenu == "Options") {
-						auto response = processMenu("Options", currentMenuIndex);
+					else if (currentMenu == "Controls") {
+						auto response = processMenu("Controls", currentMenuIndex);
 						quit = get<0>(response);
 						loadNewMenu(get<1>(response));
 						currentMenu = get<1>(response);
@@ -389,7 +388,7 @@ tuple<bool, string> processMenu(string currentMenu, int currentMenuIndex) {
         case(1):
             return make_tuple(false, "Load Simulation");
         case(2):
-            return make_tuple(false, "Options");
+            return make_tuple(false, "Controls");
         case(3):
             return make_tuple(false, "Credits");
         case(4):
@@ -419,7 +418,7 @@ tuple<bool, string> processMenu(string currentMenu, int currentMenuIndex) {
             return make_tuple(false, "Title Screen");
         }
     }
-    else if (currentMenu == "Options") {
+    else if (currentMenu == "Controls") {
         return make_tuple(false, "Title Screen");
     }
     else if (currentMenu == "Credits") {
@@ -438,8 +437,8 @@ void loadNewMenu(string newMenu) {
     else if (newMenu == "Load Simulation") {
         setupLoadSimulationScreen();
     }
-    else if (newMenu == "Options") {
-        setupOptionsScreen();
+    else if (newMenu == "Controls") {
+        setupControlsScreen();
     }
     else if (newMenu == "Credits") {
         setupCreditsScreen();
@@ -503,7 +502,7 @@ void setupTitleScreen() {
         SCREENWIDTH*0.5,
         SCREENHEIGHT*0.55,
         ALLEGRO_ALIGN_CENTRE,
-        optionsString
+        controlsString
     );
     al_draw_ustr(screenOptionsFont,
         screenOptionsColour,
@@ -542,7 +541,7 @@ void drawTitleScreenWithSelection(int previousSelection, int newSelection) {
         { float(SCREENWIDTH)*0.35, float(SCREENHEIGHT)*0.285, float(SCREENWIDTH)*0.65 },
         { float(SCREENWIDTH)*0.345, float(SCREENHEIGHT)*0.435, float(SCREENWIDTH)*0.665 },
         { float(SCREENWIDTH)*0.4, float(SCREENHEIGHT)*0.585, float(SCREENWIDTH)*0.6 },
-        { float(SCREENWIDTH)*0.41, float(SCREENHEIGHT)*0.735, float(SCREENWIDTH)*0.59 },
+        { float(SCREENWIDTH)*0.405, float(SCREENHEIGHT)*0.74, float(SCREENWIDTH)*0.59 },
         { float(SCREENWIDTH)*0.43, float(SCREENHEIGHT)*0.885, float(SCREENWIDTH)*0.57 },
     };
 
@@ -1038,7 +1037,7 @@ int normalizeLoadSimulationScreenIndex(int abnormalIndex) {
 }
 
 //Options Screen Functions
-void setupOptionsScreen()
+void setupControlsScreen()
 {
     al_clear_to_color(screenBackgroundColour);
     al_draw_ustr(screenTitleFont,
@@ -1046,7 +1045,7 @@ void setupOptionsScreen()
         SCREENWIDTH*0.5,
         SCREENHEIGHT*0.005,
         ALLEGRO_ALIGN_CENTRE,
-        optionsScreenTitle
+        controlsScreenTitle
     );
 	//Horizontal Bar
     al_draw_rectangle(
@@ -1062,35 +1061,35 @@ void setupOptionsScreen()
         SCREENWIDTH*0.005,
         SCREENHEIGHT*0.2,
         ALLEGRO_ALIGN_LEFT,
-        optionsStringOne
+		controlsStringOne
     );
     al_draw_ustr(screenOptionsSmallFont,
         screenOptionsColour,
         SCREENWIDTH*0.005,
         SCREENHEIGHT*0.28,
         ALLEGRO_ALIGN_LEFT,
-        optionsStringTwo
+		controlsStringTwo
     );
     al_draw_ustr(screenOptionsSmallFont,
         screenOptionsColour,
         SCREENWIDTH*0.005,
         SCREENHEIGHT*0.36,
         ALLEGRO_ALIGN_LEFT,
-        optionsStringThree
+		controlsStringThree
     );
     al_draw_ustr(screenOptionsSmallFont,
         screenOptionsColour,
         SCREENWIDTH*0.005,
         SCREENHEIGHT*0.44,
         ALLEGRO_ALIGN_LEFT,
-        optionsStringFour
+		controlsStringFour
     );
     al_draw_ustr(screenOptionsSmallFont,
         screenOptionsColour,
         SCREENWIDTH*0.005,
         SCREENHEIGHT*0.52,
         ALLEGRO_ALIGN_LEFT,
-        optionsStringFive
+		controlsStringFive
     );
 	//Horizontal Bar
 	al_draw_rectangle(
@@ -1106,7 +1105,7 @@ void setupOptionsScreen()
         SCREENWIDTH*0.5,
         SCREENHEIGHT*0.9,
         ALLEGRO_ALIGN_CENTRE,
-        optionsGoBackString
+		controlsGoBackString
     );
     drawTriangle(float(SCREENWIDTH)*0.4, float(SCREENHEIGHT)*0.935, 1, screenOptionsColour);
     drawTriangle(float(SCREENWIDTH)*0.6, float(SCREENHEIGHT)*0.935, -1, screenOptionsColour);
@@ -1232,6 +1231,8 @@ int initAddons() {
     al_register_event_source(mainEventQueue, al_get_display_event_source(settingsDisplay));
     al_register_event_source(mainEventQueue, al_get_keyboard_event_source());
     al_set_window_title(mainDisplay, "Project Psi Launcher");
+
+	return 0;
 }
 
 //List of Bugs to track down

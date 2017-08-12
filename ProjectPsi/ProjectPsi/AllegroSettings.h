@@ -11,3 +11,7 @@
 	static const int SCREENWIDTH = 1280;
 	static const int SCREENHEIGHT = 720;
 #endif
+
+//Putting these here to easily switch to "developer" mode for when i'm working
+//static const int SCREENWIDTH = 1280;
+//static const int SCREENHEIGHT = 720;
