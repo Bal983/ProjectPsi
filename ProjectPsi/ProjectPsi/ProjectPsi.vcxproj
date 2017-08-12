@@ -179,6 +179,9 @@
   <ItemGroup>
     <Font Include="assets\testFont.ttf" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AllegroSettings.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\packages\AllegroDeps.1.5.0.1\build\native\AllegroDeps.targets" Condition="Exists('..\packages\AllegroDeps.1.5.0.1\build\native\AllegroDeps.targets')" />

@@ -12,6 +12,10 @@
 #include <allegro5/allegro_ttf.h>
 #include <allegro5/allegro_primitives.h>
 
+//Other includes
+#include "AllegroSettings.h"
+
+
 using namespace std;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -21,28 +25,10 @@ ALLEGRO_DISPLAY *mainDisplay = NULL;
 ALLEGRO_EVENT_QUEUE *mainEventQueue = NULL;
 bool quit = false;
 
-//Try to keep only 16:9 resolution setups
-//static const int SCREENWIDTH = 1920;
-//static const int SCREENHEIGHT = 1080;
-static const int SCREENWIDTH = 1280;
-static const int SCREENHEIGHT = 720;
+//CHANGE: Moved screen resolution to .h
 
 //Variables used to initialize the simulation
-char * leftValue1 = "";
-char * leftValue2 = "";
-char * leftValue3 = "";
-char * leftValue4 = "";
-char * leftValue5 = "";
-char * leftValue6 = "";
-char * leftValue7 = "";
-char * rightValue1 = "";
-char * rightValue2 = "";
-char * rightValue3 = "";
-char * rightValue4 = "";
-char * rightValue5 = "";
-char * rightValue6 = "";
-char * rightValue7 = "";
-char * testing = "PLACEHOLDER VALUE";
+char * initValues[15] = {""};
 
 //Title Screen Variables
 ALLEGRO_USTR *mainMenuScreenTitle = al_ustr_new("Project Psi");
@@ -69,13 +55,13 @@ ALLEGRO_USTR *newSimulationLeftp4prompt = al_ustr_new("Placeholder:");
 ALLEGRO_USTR *newSimulationLeftp5prompt = al_ustr_new("Placeholder:");
 ALLEGRO_USTR *newSimulationLeftp6prompt = al_ustr_new("Placeholder:");
 ALLEGRO_USTR *newSimulationLeftp7prompt = al_ustr_new("Placeholder:");
-ALLEGRO_USTR *newSimulationLeftp1value = al_ustr_new(leftValue1);
-ALLEGRO_USTR *newSimulationLeftp2value = al_ustr_new(leftValue2);
-ALLEGRO_USTR *newSimulationLeftp3value = al_ustr_new(leftValue3);
-ALLEGRO_USTR *newSimulationLeftp4value = al_ustr_new(leftValue4);
-ALLEGRO_USTR *newSimulationLeftp5value = al_ustr_new(leftValue5);
-ALLEGRO_USTR *newSimulationLeftp6value = al_ustr_new(leftValue6);
-ALLEGRO_USTR *newSimulationLeftp7value = al_ustr_new(leftValue7);
+ALLEGRO_USTR *newSimulationLeftp1value = al_ustr_new(initValues[0]);
+ALLEGRO_USTR *newSimulationLeftp2value = al_ustr_new(initValues[1]);
+ALLEGRO_USTR *newSimulationLeftp3value = al_ustr_new(initValues[2]);
+ALLEGRO_USTR *newSimulationLeftp4value = al_ustr_new(initValues[3]);
+ALLEGRO_USTR *newSimulationLeftp5value = al_ustr_new(initValues[4]);
+ALLEGRO_USTR *newSimulationLeftp6value = al_ustr_new(initValues[5]);
+ALLEGRO_USTR *newSimulationLeftp7value = al_ustr_new(initValues[6]);
 ALLEGRO_USTR *newSimulationRightp1prompt = al_ustr_new("Placeholder:");
 ALLEGRO_USTR *newSimulationRightp2prompt = al_ustr_new("Placeholder:");
 ALLEGRO_USTR *newSimulationRightp3prompt = al_ustr_new("Placeholder:");
@@ -83,35 +69,35 @@ ALLEGRO_USTR *newSimulationRightp4prompt = al_ustr_new("Placeholder:");
 ALLEGRO_USTR *newSimulationRightp5prompt = al_ustr_new("Placeholder:");
 ALLEGRO_USTR *newSimulationRightp6prompt = al_ustr_new("Placeholder:");
 ALLEGRO_USTR *newSimulationRightp7prompt = al_ustr_new("Placeholder:");
-ALLEGRO_USTR *newSimulationRightp1value = al_ustr_new(rightValue1);
-ALLEGRO_USTR *newSimulationRightp2value = al_ustr_new(rightValue2);
-ALLEGRO_USTR *newSimulationRightp3value = al_ustr_new(rightValue3);
-ALLEGRO_USTR *newSimulationRightp4value = al_ustr_new(rightValue4);
-ALLEGRO_USTR *newSimulationRightp5value = al_ustr_new(rightValue5);
-ALLEGRO_USTR *newSimulationRightp6value = al_ustr_new(rightValue6);
-ALLEGRO_USTR *newSimulationRightp7value = al_ustr_new(rightValue7);
+ALLEGRO_USTR *newSimulationRightp1value = al_ustr_new(initValues[7]);
+ALLEGRO_USTR *newSimulationRightp2value = al_ustr_new(initValues[8]);
+ALLEGRO_USTR *newSimulationRightp3value = al_ustr_new(initValues[9]);
+ALLEGRO_USTR *newSimulationRightp4value = al_ustr_new(initValues[10]);
+ALLEGRO_USTR *newSimulationRightp5value = al_ustr_new(initValues[11]);
+ALLEGRO_USTR *newSimulationRightp6value = al_ustr_new(initValues[12]);
+ALLEGRO_USTR *newSimulationRightp7value = al_ustr_new(initValues[13]);
 ALLEGRO_USTR *newSimulationGoBackString = al_ustr_new("Go Back");
 ALLEGRO_USTR *newSimulationStartString = al_ustr_new("Start");
 ALLEGRO_USTR *newSimulationExportConfiguartionString = al_ustr_new("Export");
 const int newSimulationScreenMenuItems = 17; //Don't count the title in here
 tuple<ALLEGRO_USTR,ALLEGRO_USTR, char*> allNewSimulationScreenOptions[newSimulationScreenMenuItems] = {
-	make_tuple(*newSimulationLeftp1prompt, *newSimulationLeftp1value, leftValue1),
-	make_tuple(*newSimulationLeftp2prompt, *newSimulationLeftp2value, leftValue2),
-	make_tuple(*newSimulationLeftp3prompt, *newSimulationLeftp3value, leftValue3),
-	make_tuple(*newSimulationLeftp4prompt, *newSimulationLeftp4value, leftValue4),
-	make_tuple(*newSimulationLeftp5prompt, *newSimulationLeftp5value, leftValue5),
-	make_tuple(*newSimulationLeftp6prompt, *newSimulationLeftp6value, leftValue6),
-	make_tuple(*newSimulationLeftp7prompt, *newSimulationLeftp7value, leftValue7),
-	make_tuple(*newSimulationRightp1prompt, *newSimulationRightp1value, rightValue1),
-	make_tuple(*newSimulationRightp2prompt, *newSimulationRightp2value, rightValue2),
-	make_tuple(*newSimulationRightp3prompt, *newSimulationRightp3value, rightValue3),
-	make_tuple(*newSimulationRightp4prompt, *newSimulationRightp4value, rightValue4),
-	make_tuple(*newSimulationRightp5prompt, *newSimulationRightp5value, rightValue5),
-	make_tuple(*newSimulationRightp6prompt, *newSimulationRightp6value, rightValue6),
-	make_tuple(*newSimulationRightp7prompt, *newSimulationRightp7value, rightValue7),
-	make_tuple(*newSimulationGoBackString, *newSimulationGoBackString, testing),
-	make_tuple(*newSimulationStartString, *newSimulationStartString, testing),
-	make_tuple(*newSimulationExportConfiguartionString, *newSimulationExportConfiguartionString, testing)
+	make_tuple(*newSimulationLeftp1prompt, *newSimulationLeftp1value, initValues[0]),
+	make_tuple(*newSimulationLeftp2prompt, *newSimulationLeftp2value, initValues[1]),
+	make_tuple(*newSimulationLeftp3prompt, *newSimulationLeftp3value, initValues[2]),
+	make_tuple(*newSimulationLeftp4prompt, *newSimulationLeftp4value, initValues[3]),
+	make_tuple(*newSimulationLeftp5prompt, *newSimulationLeftp5value, initValues[4]),
+	make_tuple(*newSimulationLeftp6prompt, *newSimulationLeftp6value, initValues[5]),
+	make_tuple(*newSimulationLeftp7prompt, *newSimulationLeftp7value, initValues[6]),
+	make_tuple(*newSimulationRightp1prompt, *newSimulationRightp1value, initValues[7]),
+	make_tuple(*newSimulationRightp2prompt, *newSimulationRightp2value, initValues[8]),
+	make_tuple(*newSimulationRightp3prompt, *newSimulationRightp3value, initValues[9]),
+	make_tuple(*newSimulationRightp4prompt, *newSimulationRightp4value, initValues[10]),
+	make_tuple(*newSimulationRightp5prompt, *newSimulationRightp5value, initValues[11]),
+	make_tuple(*newSimulationRightp6prompt, *newSimulationRightp6value, initValues[12]),
+	make_tuple(*newSimulationRightp7prompt, *newSimulationRightp7value, initValues[13]),
+	make_tuple(*newSimulationGoBackString, *newSimulationGoBackString, initValues[14]),
+	make_tuple(*newSimulationStartString, *newSimulationStartString, initValues[14]),
+	make_tuple(*newSimulationExportConfiguartionString, *newSimulationExportConfiguartionString, initValues[14])
 }; //add new menu options to this array, make sure to increment maxMenuItems, so far this is just for us to keep track of them
 tuple<float, float>allNewSimulationScreenPositions[newSimulationScreenMenuItems] = {
 	make_tuple(0.2, 0.2),
@@ -643,7 +629,7 @@ void setupNewSimulationScreen() {
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
 		SCREENWIDTH*0.1,
-		SCREENHEIGHT*0.5,
+		SCREENHEIGHT*0.5618089,
 		ALLEGRO_ALIGN_CENTRE,
 		newSimulationLeftp4prompt
 	);
@@ -970,33 +956,33 @@ void exportSimluationConfiguration() {
 	exportFile << "|| In the future it will be and this will be removed ||\n";
 	exportFile << "||===================================================||\n\n";
 	exportFile << "//This value is used for something\n";
-	exportFile << "Left Placeholder 1 Value is:  " << leftValue1 << "\n\n";
+	exportFile << "Left Placeholder 1 Value is:  " << initValues[0] << "\n\n";
 	exportFile << "//This value is used for something\n";
-	exportFile << "Left Placeholder 2 Value is:  " << leftValue2 << "\n\n";
+	exportFile << "Left Placeholder 2 Value is:  " << initValues[1] << "\n\n";
 	exportFile << "//This value is used for something\n";
-	exportFile << "Left Placeholder 3 Value is:  " << leftValue3 << "\n\n";
+	exportFile << "Left Placeholder 3 Value is:  " << initValues[2] << "\n\n";
 	exportFile << "//This value is used for something\n";
-	exportFile << "Left Placeholder 4 Value is:  " << leftValue4 << "\n\n";
+	exportFile << "Left Placeholder 4 Value is:  " << initValues[3] << "\n\n";
 	exportFile << "//This value is used for something\n";
-	exportFile << "Left Placeholder 5 Value is:  " << leftValue5 << "\n\n";
+	exportFile << "Left Placeholder 5 Value is:  " << initValues[4] << "\n\n";
 	exportFile << "//This value is used for something\n";
-	exportFile << "Left Placeholder 6 Value is:  " << leftValue6 << "\n\n";
+	exportFile << "Left Placeholder 6 Value is:  " << initValues[5] << "\n\n";
 	exportFile << "//This value is used for something\n";
-	exportFile << "Left Placeholder 7 Value is:  " << leftValue7 << "\n\n";
+	exportFile << "Left Placeholder 7 Value is:  " << initValues[6] << "\n\n";
 	exportFile << "//This value is used for something\n";
-	exportFile << "Right Placeholder 1 Value is: " << rightValue1 << "\n\n";
+	exportFile << "Right Placeholder 1 Value is: " << initValues[7] << "\n\n";
 	exportFile << "//This value is used for something\n";
-	exportFile << "Right Placeholder 2 Value is: " << rightValue2 << "\n\n";
+	exportFile << "Right Placeholder 2 Value is: " << initValues[8] << "\n\n";
 	exportFile << "//This value is used for something\n";
-	exportFile << "Right Placeholder 3 Value is: " << rightValue3 << "\n\n";
+	exportFile << "Right Placeholder 3 Value is: " << initValues[9] << "\n\n";
 	exportFile << "//This value is used for something\n";
-	exportFile << "Right Placeholder 4 Value is: " << rightValue4 << "\n\n";
+	exportFile << "Right Placeholder 4 Value is: " << initValues[10] << "\n\n";
 	exportFile << "//This value is used for something\n";
-	exportFile << "Right Placeholder 5 Value is: " << rightValue5 << "\n\n";
+	exportFile << "Right Placeholder 5 Value is: " << initValues[11] << "\n\n";
 	exportFile << "//This value is used for something\n";
-	exportFile << "Right Placeholder 6 Value is: " << rightValue6 << "\n\n";
+	exportFile << "Right Placeholder 6 Value is: " << initValues[12] << "\n\n";
 	exportFile << "//This value is used for something\n";
-	exportFile << "Right Placeholder 7 Value is: " << rightValue7 << "\n\n";
+	exportFile << "Right Placeholder 7 Value is: " << initValues[13] << "\n\n";
 	exportFile.close();
 }
 //Load Simulation Screen Functions

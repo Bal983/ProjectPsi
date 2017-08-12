@@ -26,4 +26,9 @@
       <Filter>Assets</Filter>
     </Font>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AllegroSettings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
 </Project>
