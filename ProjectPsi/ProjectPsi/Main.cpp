@@ -19,13 +19,7 @@
 using namespace std;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//Generic Variables
-ALLEGRO_DISPLAY *settingsDisplay = NULL;
-ALLEGRO_DISPLAY *mainDisplay = NULL;
-ALLEGRO_EVENT_QUEUE *mainEventQueue = NULL;
-bool quit = false;
 
-//CHANGE: Moved screen resolution to .h
 
 //Variables used to initialize the simulation
 char * initValues[15] = {""};
@@ -1184,7 +1178,7 @@ void setupCreditsScreen()
 
 //Initialization Functions
 int initAddons() {
-	const char * fontPath = "assets\\testFont.ttf";
+	
     if (!al_init() && !al_init_font_addon() && !al_install_keyboard()) {
         cout << "failed to initialize allegro!" << endl;
         return -1;
@@ -1210,19 +1204,19 @@ int initAddons() {
         cout << "failed to create display!" << endl;
         return -1;
     }
-    screenOptionsFont = al_load_ttf_font(fontPath, SCREENWIDTH / 25.6, 0);
+    screenOptionsFont = al_load_ttf_font(font1Path, SCREENWIDTH / 25.6, 0);
     if (!screenOptionsFont) {
         cout << "Could not load \"testFont.ttf\"" << endl;
         cout << "Make sure the correct font is in the executable location!" << endl;
         screenOptionsFont = al_create_builtin_font();
     }
-    screenOptionsSmallFont = al_load_ttf_font(fontPath, SCREENWIDTH / 36.6, 0);
+    screenOptionsSmallFont = al_load_ttf_font(font1Path, SCREENWIDTH / 36.6, 0);
     if (!screenOptionsSmallFont) {
         cout << "Could not load \"testFont.ttf\"" << endl;
         cout << "Make sure the correct font is in the executable location!" << endl;
         screenOptionsSmallFont = al_create_builtin_font();
     }
-    screenTitleFont = al_load_ttf_font(fontPath, SCREENWIDTH / 12.8, 0);
+    screenTitleFont = al_load_ttf_font(font1Path, SCREENWIDTH / 12.8, 0);
     if (!screenTitleFont) {
         cout << "Could not load \"testFont.ttf\"" << endl;
         cout << "Make sure the correct font is in the executable location!" << endl;
