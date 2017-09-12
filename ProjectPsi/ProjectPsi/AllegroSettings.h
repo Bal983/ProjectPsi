@@ -11,10 +11,3 @@
 	static const int SCREENWIDTH = 1280;
 	static const int SCREENHEIGHT = 720;
 #endif
-
-	//Generic Variables
-	const char * font1Path = "assets\\testFont.ttf";
-	ALLEGRO_DISPLAY *settingsDisplay = NULL;
-	ALLEGRO_DISPLAY *mainDisplay = NULL;
-	ALLEGRO_EVENT_QUEUE *mainEventQueue = NULL;
-	bool quit = false;
