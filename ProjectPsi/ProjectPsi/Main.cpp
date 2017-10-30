@@ -16,6 +16,7 @@
 
 //Other includes
 #include "AllegroSettings.h"
+#include "Game.h"
 
 using namespace std;
 
@@ -161,13 +162,6 @@ ALLEGRO_USTR *allCreditsScreenOptions[creditsScreenMenuItems] = {
     creditsStringFour
 }; //add new menu options to this array, make sure to increment maxMenuItems, so far this is just for us to keep track of them
 
-//Colours and Fonts
-ALLEGRO_COLOR screenOptionsColour = al_map_rgb_f(0.8706, 0.7216, 0.5294); //burlywood colour
-ALLEGRO_COLOR screenBackgroundColour = al_map_rgb_f(0, 0, 0); //black colour
-ALLEGRO_FONT *screenOptionsFont = NULL;
-ALLEGRO_FONT *screenOptionsSmallFont = NULL;
-ALLEGRO_FONT *screenTitleFont = NULL;
-
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //Function prototypes so I can keep being a java programmer
 //Generic Functions
@@ -202,6 +196,9 @@ void setupControlsScreen();
 
 //Credits Functions
 void setupCreditsScreen();
+
+//Simulation Functions
+void setupSimulationScreen();
 
 //Init Functions
 int initAddons();
@@ -255,6 +252,11 @@ int main(int argc, char **argv) {
 						if (!valueInputMode){
 							loadNewMenu(get<1>(response));
 							currentMenu = get<1>(response);
+							if (currentMenu == "Simulation") {
+								Game * game = new Game(512, 512, initializationValues);
+								game->generate();
+								game->run();
+							}
 							currentMenuIndex = 0;
 						}
 					}
@@ -363,14 +365,14 @@ int main(int argc, char **argv) {
 void drawTriangle(float topLeftX, float topLeftY, int direction, ALLEGRO_COLOR colour) {
     if (direction > 0) {
         al_draw_filled_triangle(topLeftX, topLeftY,
-            topLeftX + SCREENWIDTH*0.02, topLeftY + SCREENHEIGHT*0.02,
-            topLeftX, topLeftY + SCREENHEIGHT* 0.04,
+            topLeftX + LAUNCHER_SCREENWIDTH*0.02, topLeftY + LAUNCHER_SCREENHEIGHT*0.02,
+            topLeftX, topLeftY + LAUNCHER_SCREENHEIGHT* 0.04,
             colour);
     }
     else {
         al_draw_filled_triangle(topLeftX, topLeftY,
-            topLeftX - SCREENWIDTH*0.02, topLeftY + SCREENHEIGHT*0.02,
-            topLeftX, topLeftY + SCREENHEIGHT* 0.04,
+            topLeftX - LAUNCHER_SCREENWIDTH*0.02, topLeftY + LAUNCHER_SCREENHEIGHT*0.02,
+            topLeftX, topLeftY + LAUNCHER_SCREENHEIGHT* 0.04,
             colour);
     }
 }
@@ -389,7 +391,7 @@ tuple<bool, string> processMenu(string currentMenu, int currentMenuIndex) {
             return make_tuple(false, "Credits");
         case(4):
             return make_tuple(true, "Exiting the game, doesn't matter");
-        deafult:
+        default:
             break;
         }
     }
@@ -439,6 +441,9 @@ void loadNewMenu(string newMenu) {
     else if (newMenu == "Credits") {
         setupCreditsScreen();
     }
+	else if (newMenu == "Simulation") {
+		setupSimulationScreen();
+	}
 }
 
 int normalizeScreenIndex(int abnormalIndex, int maxMenuIndex) {
@@ -465,57 +470,57 @@ void setupTitleScreen() {
     al_clear_to_color(screenBackgroundColour);
     al_draw_ustr(screenTitleFont,
         screenOptionsColour,
-        SCREENWIDTH*0.5,
-        SCREENHEIGHT*0.005,
+        LAUNCHER_SCREENWIDTH*0.5,
+        LAUNCHER_SCREENHEIGHT*0.005,
         ALLEGRO_ALIGN_CENTRE,
         mainMenuScreenTitle
     );
 	//Horizontal Bar
     al_draw_rectangle(
         0,
-        SCREENHEIGHT*0.193,
-        SCREENWIDTH,
-        SCREENHEIGHT*0.197,
+        LAUNCHER_SCREENHEIGHT*0.193,
+        LAUNCHER_SCREENWIDTH,
+        LAUNCHER_SCREENHEIGHT*0.197,
         screenOptionsColour,
         7
     );
     al_draw_ustr(screenOptionsFont,
         screenOptionsColour,
-        SCREENWIDTH*0.5,
-        SCREENHEIGHT*0.25,
+        LAUNCHER_SCREENWIDTH*0.5,
+        LAUNCHER_SCREENHEIGHT*0.25,
         ALLEGRO_ALIGN_CENTRE,
         newSimulationString
     );
     al_draw_ustr(screenOptionsFont,
         screenOptionsColour,
-        SCREENWIDTH*0.5,
-        SCREENHEIGHT*0.40,
+        LAUNCHER_SCREENWIDTH*0.5,
+        LAUNCHER_SCREENHEIGHT*0.40,
         ALLEGRO_ALIGN_CENTRE,
         loadSimulationString
     );
     al_draw_ustr(screenOptionsFont,
         screenOptionsColour,
-        SCREENWIDTH*0.5,
-        SCREENHEIGHT*0.55,
+        LAUNCHER_SCREENWIDTH*0.5,
+        LAUNCHER_SCREENHEIGHT*0.55,
         ALLEGRO_ALIGN_CENTRE,
         controlsString
     );
     al_draw_ustr(screenOptionsFont,
         screenOptionsColour,
-        SCREENWIDTH*0.5,
-        SCREENHEIGHT*0.70,
+        LAUNCHER_SCREENWIDTH*0.5,
+        LAUNCHER_SCREENHEIGHT*0.70,
         ALLEGRO_ALIGN_CENTRE,
         creditsString
     );
     al_draw_ustr(screenOptionsFont,
         screenOptionsColour,
-        SCREENWIDTH*0.5,
-        SCREENHEIGHT*0.85,
+        LAUNCHER_SCREENWIDTH*0.5,
+        LAUNCHER_SCREENHEIGHT*0.85,
         ALLEGRO_ALIGN_CENTRE,
         quitString
     );
-    drawTriangle(float(SCREENWIDTH)*0.35, float(SCREENHEIGHT)*0.285, 1, screenOptionsColour);
-    drawTriangle(float(SCREENWIDTH)*0.65, float(SCREENHEIGHT)*0.285, -1, screenOptionsColour);
+    drawTriangle(float(LAUNCHER_SCREENWIDTH)*0.35, float(LAUNCHER_SCREENHEIGHT)*0.285, 1, screenOptionsColour);
+    drawTriangle(float(LAUNCHER_SCREENWIDTH)*0.65, float(LAUNCHER_SCREENHEIGHT)*0.285, -1, screenOptionsColour);
     al_flip_display();
 }
 
@@ -534,11 +539,11 @@ void moveTitleScreenUp(int currentMenuIndex) {
 void drawTitleScreenWithSelection(int previousSelection, int newSelection) {
     //These are in format leftTriangleX1, triangleY, rightTriangleX1
     float titleScreenArrows[][3] = {
-        { float(SCREENWIDTH)*0.35, float(SCREENHEIGHT)*0.285, float(SCREENWIDTH)*0.65 },
-        { float(SCREENWIDTH)*0.345, float(SCREENHEIGHT)*0.435, float(SCREENWIDTH)*0.665 },
-        { float(SCREENWIDTH)*0.4, float(SCREENHEIGHT)*0.585, float(SCREENWIDTH)*0.6 },
-        { float(SCREENWIDTH)*0.405, float(SCREENHEIGHT)*0.74, float(SCREENWIDTH)*0.59 },
-        { float(SCREENWIDTH)*0.43, float(SCREENHEIGHT)*0.885, float(SCREENWIDTH)*0.57 },
+        { float(LAUNCHER_SCREENWIDTH)*0.35, float(LAUNCHER_SCREENHEIGHT)*0.285, float(LAUNCHER_SCREENWIDTH)*0.65 },
+        { float(LAUNCHER_SCREENWIDTH)*0.345, float(LAUNCHER_SCREENHEIGHT)*0.435, float(LAUNCHER_SCREENWIDTH)*0.665 },
+        { float(LAUNCHER_SCREENWIDTH)*0.4, float(LAUNCHER_SCREENHEIGHT)*0.585, float(LAUNCHER_SCREENWIDTH)*0.6 },
+        { float(LAUNCHER_SCREENWIDTH)*0.405, float(LAUNCHER_SCREENHEIGHT)*0.74, float(LAUNCHER_SCREENWIDTH)*0.59 },
+        { float(LAUNCHER_SCREENWIDTH)*0.43, float(LAUNCHER_SCREENHEIGHT)*0.885, float(LAUNCHER_SCREENWIDTH)*0.57 },
     };
 
 	previousSelection = normalizeTitleScreenIndex(previousSelection);
@@ -557,256 +562,256 @@ void setupNewSimulationScreen() {
     al_clear_to_color(screenBackgroundColour);
     al_draw_ustr(screenTitleFont,
         screenOptionsColour,
-        SCREENWIDTH*0.5,
-        SCREENHEIGHT*0.005,
+        LAUNCHER_SCREENWIDTH*0.5,
+        LAUNCHER_SCREENHEIGHT*0.005,
         ALLEGRO_ALIGN_CENTRE,
         newSimulationScreenTitle
     );
 	//Horizontal Bar
 	al_draw_filled_rectangle(
         0,
-        SCREENHEIGHT*0.193,
-        SCREENWIDTH,
-        SCREENHEIGHT*0.197,
+        LAUNCHER_SCREENHEIGHT*0.193,
+        LAUNCHER_SCREENWIDTH,
+        LAUNCHER_SCREENHEIGHT*0.197,
         screenOptionsColour
     );
 	//Vertical Bar
 	al_draw_filled_rectangle(
-        SCREENWIDTH*0.4995,
-        SCREENHEIGHT*0.193,
-        SCREENWIDTH*0.5005,
-        SCREENHEIGHT*0.903,
+        LAUNCHER_SCREENWIDTH*0.4995,
+        LAUNCHER_SCREENHEIGHT*0.193,
+        LAUNCHER_SCREENWIDTH*0.5005,
+        LAUNCHER_SCREENHEIGHT*0.903,
         screenOptionsColour
     );
 	//Lefthand Side Options
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
-		SCREENWIDTH*0.1,
-		SCREENHEIGHT*0.2,
+		LAUNCHER_SCREENWIDTH*0.1,
+		LAUNCHER_SCREENHEIGHT*0.2,
 		ALLEGRO_ALIGN_CENTRE,
 		newSimulationLeftp1prompt
 	);
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
-		SCREENWIDTH*0.2,
-		SCREENHEIGHT*0.2,
+		LAUNCHER_SCREENWIDTH*0.2,
+		LAUNCHER_SCREENHEIGHT*0.2,
 		ALLEGRO_ALIGN_LEFT,
 		newSimulationLeftp1value
 	);
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
-		SCREENWIDTH*0.1,
-		SCREENHEIGHT*0.3,
+		LAUNCHER_SCREENWIDTH*0.1,
+		LAUNCHER_SCREENHEIGHT*0.3,
 		ALLEGRO_ALIGN_CENTRE,
 		newSimulationLeftp2prompt
 	);
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
-		SCREENWIDTH*0.2,
-		SCREENHEIGHT*0.3,
+		LAUNCHER_SCREENWIDTH*0.2,
+		LAUNCHER_SCREENHEIGHT*0.3,
 		ALLEGRO_ALIGN_LEFT,
 		newSimulationLeftp2value
 	);
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
-		SCREENWIDTH*0.1,
-		SCREENHEIGHT*0.4,
+		LAUNCHER_SCREENWIDTH*0.1,
+		LAUNCHER_SCREENHEIGHT*0.4,
 		ALLEGRO_ALIGN_CENTRE,
 		newSimulationLeftp3prompt
 	);
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
-		SCREENWIDTH*0.2,
-		SCREENHEIGHT*0.4,
+		LAUNCHER_SCREENWIDTH*0.2,
+		LAUNCHER_SCREENHEIGHT*0.4,
 		ALLEGRO_ALIGN_LEFT,
 		newSimulationLeftp3value
 	);
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
-		SCREENWIDTH*0.1,
-		SCREENHEIGHT*0.5,
+		LAUNCHER_SCREENWIDTH*0.1,
+		LAUNCHER_SCREENHEIGHT*0.5,
 		ALLEGRO_ALIGN_CENTRE,
 		newSimulationLeftp4prompt
 	);
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
-		SCREENWIDTH*0.2,
-		SCREENHEIGHT*0.5,
+		LAUNCHER_SCREENWIDTH*0.2,
+		LAUNCHER_SCREENHEIGHT*0.5,
 		ALLEGRO_ALIGN_LEFT,
 		newSimulationLeftp4value
 	);
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
-		SCREENWIDTH*0.1,
-		SCREENHEIGHT*0.6,
+		LAUNCHER_SCREENWIDTH*0.1,
+		LAUNCHER_SCREENHEIGHT*0.6,
 		ALLEGRO_ALIGN_CENTRE,
 		newSimulationLeftp5prompt
 	);
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
-		SCREENWIDTH*0.2,
-		SCREENHEIGHT*0.6,
+		LAUNCHER_SCREENWIDTH*0.2,
+		LAUNCHER_SCREENHEIGHT*0.6,
 		ALLEGRO_ALIGN_LEFT,
 		newSimulationLeftp5value
 	);
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
-		SCREENWIDTH*0.1,
-		SCREENHEIGHT*0.7,
+		LAUNCHER_SCREENWIDTH*0.1,
+		LAUNCHER_SCREENHEIGHT*0.7,
 		ALLEGRO_ALIGN_CENTRE,
 		newSimulationLeftp6prompt
 	);
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
-		SCREENWIDTH*0.2,
-		SCREENHEIGHT*0.7,
+		LAUNCHER_SCREENWIDTH*0.2,
+		LAUNCHER_SCREENHEIGHT*0.7,
 		ALLEGRO_ALIGN_LEFT,
 		newSimulationLeftp6value
 	);
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
-		SCREENWIDTH*0.1,
-		SCREENHEIGHT*0.8,
+		LAUNCHER_SCREENWIDTH*0.1,
+		LAUNCHER_SCREENHEIGHT*0.8,
 		ALLEGRO_ALIGN_CENTRE,
 		newSimulationLeftp7prompt
 	);
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
-		SCREENWIDTH*0.2,
-		SCREENHEIGHT*0.8,
+		LAUNCHER_SCREENWIDTH*0.2,
+		LAUNCHER_SCREENHEIGHT*0.8,
 		ALLEGRO_ALIGN_LEFT,
 		newSimulationLeftp7value
 	);
 	//Righthand Side Options
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
-		SCREENWIDTH*0.6,
-		SCREENHEIGHT*0.2,
+		LAUNCHER_SCREENWIDTH*0.6,
+		LAUNCHER_SCREENHEIGHT*0.2,
 		ALLEGRO_ALIGN_CENTRE,
 		newSimulationRightp1prompt
 	);
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
-		SCREENWIDTH*0.7,
-		SCREENHEIGHT*0.2,
+		LAUNCHER_SCREENWIDTH*0.7,
+		LAUNCHER_SCREENHEIGHT*0.2,
 		ALLEGRO_ALIGN_LEFT,
 		newSimulationRightp1value
 	);
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
-		SCREENWIDTH*0.6,
-		SCREENHEIGHT*0.3,
+		LAUNCHER_SCREENWIDTH*0.6,
+		LAUNCHER_SCREENHEIGHT*0.3,
 		ALLEGRO_ALIGN_CENTRE,
 		newSimulationRightp2prompt
 	);
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
-		SCREENWIDTH*0.7,
-		SCREENHEIGHT*0.3,
+		LAUNCHER_SCREENWIDTH*0.7,
+		LAUNCHER_SCREENHEIGHT*0.3,
 		ALLEGRO_ALIGN_LEFT,
 		newSimulationRightp2value
 	);
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
-		SCREENWIDTH*0.6,
-		SCREENHEIGHT*0.4,
+		LAUNCHER_SCREENWIDTH*0.6,
+		LAUNCHER_SCREENHEIGHT*0.4,
 		ALLEGRO_ALIGN_CENTRE,
 		newSimulationRightp3prompt
 	);
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
-		SCREENWIDTH*0.7,
-		SCREENHEIGHT*0.4,
+		LAUNCHER_SCREENWIDTH*0.7,
+		LAUNCHER_SCREENHEIGHT*0.4,
 		ALLEGRO_ALIGN_LEFT,
 		newSimulationRightp3value
 	);
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
-		SCREENWIDTH*0.6,
-		SCREENHEIGHT*0.5,
+		LAUNCHER_SCREENWIDTH*0.6,
+		LAUNCHER_SCREENHEIGHT*0.5,
 		ALLEGRO_ALIGN_CENTRE,
 		newSimulationRightp4prompt
 	);
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
-		SCREENWIDTH*0.7,
-		SCREENHEIGHT*0.5,
+		LAUNCHER_SCREENWIDTH*0.7,
+		LAUNCHER_SCREENHEIGHT*0.5,
 		ALLEGRO_ALIGN_LEFT,
 		newSimulationRightp4value
 	);
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
-		SCREENWIDTH*0.6,
-		SCREENHEIGHT*0.6,
+		LAUNCHER_SCREENWIDTH*0.6,
+		LAUNCHER_SCREENHEIGHT*0.6,
 		ALLEGRO_ALIGN_CENTRE,
 		newSimulationRightp5prompt
 	);
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
-		SCREENWIDTH*0.7,
-		SCREENHEIGHT*0.6,
+		LAUNCHER_SCREENWIDTH*0.7,
+		LAUNCHER_SCREENHEIGHT*0.6,
 		ALLEGRO_ALIGN_LEFT,
 		newSimulationRightp5value
 	);
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
-		SCREENWIDTH*0.6,
-		SCREENHEIGHT*0.7,
+		LAUNCHER_SCREENWIDTH*0.6,
+		LAUNCHER_SCREENHEIGHT*0.7,
 		ALLEGRO_ALIGN_CENTRE,
 		newSimulationRightp6prompt
 	);
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
-		SCREENWIDTH*0.7,
-		SCREENHEIGHT*0.7,
+		LAUNCHER_SCREENWIDTH*0.7,
+		LAUNCHER_SCREENHEIGHT*0.7,
 		ALLEGRO_ALIGN_LEFT,
 		newSimulationRightp6value
 	);
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
-		SCREENWIDTH*0.6,
-		SCREENHEIGHT*0.8,
+		LAUNCHER_SCREENWIDTH*0.6,
+		LAUNCHER_SCREENHEIGHT*0.8,
 		ALLEGRO_ALIGN_CENTRE,
 		newSimulationRightp7prompt
 	);
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
-		SCREENWIDTH*0.7,
-		SCREENHEIGHT*0.8,
+		LAUNCHER_SCREENWIDTH*0.7,
+		LAUNCHER_SCREENHEIGHT*0.8,
 		ALLEGRO_ALIGN_LEFT,
 		newSimulationRightp7value
 	);
 	//Horizontal Bar
 	al_draw_filled_rectangle(
 		0,
-		SCREENHEIGHT*0.903,
-		SCREENWIDTH,
-		SCREENHEIGHT*0.907,
+		LAUNCHER_SCREENHEIGHT*0.903,
+		LAUNCHER_SCREENWIDTH,
+		LAUNCHER_SCREENHEIGHT*0.907,
 		screenOptionsColour
 	);
 	//Bottom of the screen options
     al_draw_ustr(screenOptionsFont,
         screenOptionsColour,
-        SCREENWIDTH*0.5,
-        SCREENHEIGHT*0.9,
+        LAUNCHER_SCREENWIDTH*0.5,
+        LAUNCHER_SCREENHEIGHT*0.9,
         ALLEGRO_ALIGN_CENTRE,
         newSimulationGoBackString
     );
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
-		SCREENWIDTH*0.1,
-		SCREENHEIGHT*0.9,
+		LAUNCHER_SCREENWIDTH*0.1,
+		LAUNCHER_SCREENHEIGHT*0.9,
 		ALLEGRO_ALIGN_CENTRE,
 		newSimulationExportConfiguartionString
 	);
 	al_draw_ustr(screenOptionsFont,
 		screenOptionsColour,
-		SCREENWIDTH*0.9,
-		SCREENHEIGHT*0.9,
+		LAUNCHER_SCREENWIDTH*0.9,
+		LAUNCHER_SCREENHEIGHT*0.9,
 		ALLEGRO_ALIGN_CENTRE,
 		newSimulationStartString
 	);
-    drawTriangle(float(SCREENWIDTH)*0.49, float(SCREENHEIGHT)*0.235, -1, screenOptionsColour);
+    drawTriangle(float(LAUNCHER_SCREENWIDTH)*0.49, float(LAUNCHER_SCREENHEIGHT)*0.235, -1, screenOptionsColour);
     al_flip_display();
 }
 
@@ -825,23 +830,23 @@ void moveNewSimulationScreenUp(int currentMenuIndex) {
 void drawNewSimulationScreenWithSelection(int previousSelection, int newSelection) {
 	//These are in format leftTriangleX1, triangleY, rightTriangleX1
 	float newSimulationScreenArrows[][3] = {
-		{ float(SCREENWIDTH)*0.49, float(SCREENHEIGHT)*0.235, 0},
-		{ float(SCREENWIDTH)*0.49, float(SCREENHEIGHT)*0.335, 0},
-		{ float(SCREENWIDTH)*0.49, float(SCREENHEIGHT)*0.435, 0},
-		{ float(SCREENWIDTH)*0.49, float(SCREENHEIGHT)*0.535, 0},
-		{ float(SCREENWIDTH)*0.49, float(SCREENHEIGHT)*0.635, 0},
-		{ float(SCREENWIDTH)*0.49, float(SCREENHEIGHT)*0.735, 0},
-		{ float(SCREENWIDTH)*0.49, float(SCREENHEIGHT)*0.835, 0},
-		{ float(SCREENWIDTH)*0.99, float(SCREENHEIGHT)*0.235, 0},
-		{ float(SCREENWIDTH)*0.99, float(SCREENHEIGHT)*0.335, 0},
-		{ float(SCREENWIDTH)*0.99, float(SCREENHEIGHT)*0.435, 0},
-		{ float(SCREENWIDTH)*0.99, float(SCREENHEIGHT)*0.535, 0},
-		{ float(SCREENWIDTH)*0.99, float(SCREENHEIGHT)*0.635, 0},
-		{ float(SCREENWIDTH)*0.99, float(SCREENHEIGHT)*0.735, 0},
-		{ float(SCREENWIDTH)*0.99, float(SCREENHEIGHT)*0.835, 0},
-		{ float(SCREENWIDTH)*0.4, float(SCREENHEIGHT)*0.935, float(SCREENWIDTH)*0.6},
-		{ float(SCREENWIDTH)*0.015, float(SCREENHEIGHT)*0.935, float(SCREENWIDTH)*0.185},
-		{ float(SCREENWIDTH)*0.82, float(SCREENHEIGHT)*0.935, float(SCREENWIDTH)*0.98}
+		{ float(LAUNCHER_SCREENWIDTH)*0.49, float(LAUNCHER_SCREENHEIGHT)*0.235, 0},
+		{ float(LAUNCHER_SCREENWIDTH)*0.49, float(LAUNCHER_SCREENHEIGHT)*0.335, 0},
+		{ float(LAUNCHER_SCREENWIDTH)*0.49, float(LAUNCHER_SCREENHEIGHT)*0.435, 0},
+		{ float(LAUNCHER_SCREENWIDTH)*0.49, float(LAUNCHER_SCREENHEIGHT)*0.535, 0},
+		{ float(LAUNCHER_SCREENWIDTH)*0.49, float(LAUNCHER_SCREENHEIGHT)*0.635, 0},
+		{ float(LAUNCHER_SCREENWIDTH)*0.49, float(LAUNCHER_SCREENHEIGHT)*0.735, 0},
+		{ float(LAUNCHER_SCREENWIDTH)*0.49, float(LAUNCHER_SCREENHEIGHT)*0.835, 0},
+		{ float(LAUNCHER_SCREENWIDTH)*0.99, float(LAUNCHER_SCREENHEIGHT)*0.235, 0},
+		{ float(LAUNCHER_SCREENWIDTH)*0.99, float(LAUNCHER_SCREENHEIGHT)*0.335, 0},
+		{ float(LAUNCHER_SCREENWIDTH)*0.99, float(LAUNCHER_SCREENHEIGHT)*0.435, 0},
+		{ float(LAUNCHER_SCREENWIDTH)*0.99, float(LAUNCHER_SCREENHEIGHT)*0.535, 0},
+		{ float(LAUNCHER_SCREENWIDTH)*0.99, float(LAUNCHER_SCREENHEIGHT)*0.635, 0},
+		{ float(LAUNCHER_SCREENWIDTH)*0.99, float(LAUNCHER_SCREENHEIGHT)*0.735, 0},
+		{ float(LAUNCHER_SCREENWIDTH)*0.99, float(LAUNCHER_SCREENHEIGHT)*0.835, 0},
+		{ float(LAUNCHER_SCREENWIDTH)*0.4, float(LAUNCHER_SCREENHEIGHT)*0.935, float(LAUNCHER_SCREENWIDTH)*0.6},
+		{ float(LAUNCHER_SCREENWIDTH)*0.015, float(LAUNCHER_SCREENHEIGHT)*0.935, float(LAUNCHER_SCREENWIDTH)*0.185},
+		{ float(LAUNCHER_SCREENWIDTH)*0.82, float(LAUNCHER_SCREENHEIGHT)*0.935, float(LAUNCHER_SCREENWIDTH)*0.98}
 	};
 
 	previousSelection = normalizeNewSimulationScreenIndex(previousSelection);
@@ -877,25 +882,25 @@ void updateNewSimulationScreenString(int currentMenuItemIndex, char updateChar) 
 	auto screenPositions = allNewSimulationScreenPositions[currentMenuItemIndex];
 	int rectangleEndPosition = 0;
 	if (currentMenuItemIndex >= 0 && currentMenuItemIndex < 7) {
-		rectangleEndPosition = SCREENWIDTH * 0.45;
+		rectangleEndPosition = LAUNCHER_SCREENWIDTH * 0.45;
 	}
 	else {
-		rectangleEndPosition = SCREENWIDTH * 0.95;
+		rectangleEndPosition = LAUNCHER_SCREENWIDTH * 0.95;
 	}
 	if (al_ustr_length(&get<1>(screenItem)) < 10) {
 		al_flip_display();
 		al_draw_filled_rectangle(
-			SCREENWIDTH * (get<0>(screenPositions)),
-			SCREENHEIGHT * (get<1>(screenPositions) + 0.015),
+			LAUNCHER_SCREENWIDTH * (get<0>(screenPositions)),
+			LAUNCHER_SCREENHEIGHT * (get<1>(screenPositions) + 0.015),
 			rectangleEndPosition,
-			SCREENHEIGHT * (get<1>(screenPositions) + 0.095),
+			LAUNCHER_SCREENHEIGHT * (get<1>(screenPositions) + 0.095),
 			screenBackgroundColour
 		);
 		al_ustr_append_chr(&get<1>(screenItem), updateChar);
 		al_draw_ustr(screenOptionsFont,
 			screenOptionsColour,
-			SCREENWIDTH * get<0>(screenPositions),
-			SCREENHEIGHT * get<1>(screenPositions),
+			LAUNCHER_SCREENWIDTH * get<0>(screenPositions),
+			LAUNCHER_SCREENHEIGHT * get<1>(screenPositions),
 			ALLEGRO_ALIGN_LEFT,
 			&get<1>(screenItem)
 		);
@@ -916,26 +921,26 @@ void removeCharFromNewSimluationScreenString(int currentMenuItemIndex) {
 	int rectangleEndPosition = 0;
 	cout << currentMenuItemIndex << endl;
 	if (currentMenuItemIndex >= 0 && currentMenuItemIndex < 7) {
-		rectangleEndPosition = SCREENWIDTH * 0.45;
+		rectangleEndPosition = LAUNCHER_SCREENWIDTH * 0.45;
 	}
 	else {
-		rectangleEndPosition = SCREENWIDTH * 0.95;
+		rectangleEndPosition = LAUNCHER_SCREENWIDTH * 0.95;
 	}
 	cout << rectangleEndPosition << endl;
 	if (al_ustr_length(&get<1>(screenItem)) > 0) {
 		al_flip_display();
 		al_draw_filled_rectangle(
-			SCREENWIDTH * (get<0>(screenPositions) - 0.001),
-			SCREENHEIGHT * (get<1>(screenPositions) - 0.00249),
+			LAUNCHER_SCREENWIDTH * (get<0>(screenPositions) - 0.001),
+			LAUNCHER_SCREENHEIGHT * (get<1>(screenPositions) - 0.00249),
 			rectangleEndPosition,
-			SCREENHEIGHT * (get<1>(screenPositions) + 0.095),
+			LAUNCHER_SCREENHEIGHT * (get<1>(screenPositions) + 0.095),
 			screenBackgroundColour
 		);
 		al_ustr_remove_chr(&get<1>(screenItem), al_ustr_offset(&get<1>(screenItem), al_ustr_length(&get<1>(screenItem)) - 1));
 		al_draw_ustr(screenOptionsFont,
 			screenOptionsColour,
-			SCREENWIDTH * get<0>(screenPositions),
-			SCREENHEIGHT * get<1>(screenPositions),
+			LAUNCHER_SCREENWIDTH * get<0>(screenPositions),
+			LAUNCHER_SCREENHEIGHT * get<1>(screenPositions),
 			ALLEGRO_ALIGN_LEFT,
 			&get<1>(screenItem)
 		);
@@ -999,45 +1004,45 @@ void setupLoadSimulationScreen()
     al_clear_to_color(screenBackgroundColour);
     al_draw_ustr(screenTitleFont,
         screenOptionsColour,
-        SCREENWIDTH*0.5,
-        SCREENHEIGHT*0.005,
+        LAUNCHER_SCREENWIDTH*0.5,
+        LAUNCHER_SCREENHEIGHT*0.005,
         ALLEGRO_ALIGN_CENTRE,
         loadSimulationScreenTitle
     );
 	//Horizontal Bar
     al_draw_rectangle(
         0,
-        SCREENHEIGHT*0.193,
-        SCREENWIDTH,
-        SCREENHEIGHT*0.197,
+        LAUNCHER_SCREENHEIGHT*0.193,
+        LAUNCHER_SCREENWIDTH,
+        LAUNCHER_SCREENHEIGHT*0.197,
         screenOptionsColour,
         7
     );
     al_draw_ustr(screenOptionsFont,
         screenOptionsColour,
-        SCREENWIDTH*0.5,
-        SCREENHEIGHT*0.5,
+        LAUNCHER_SCREENWIDTH*0.5,
+        LAUNCHER_SCREENHEIGHT*0.5,
         ALLEGRO_ALIGN_CENTRE,
         loadSimulationStringOne
     );
 	//Horizontal Bar
 	al_draw_rectangle(
 		0,
-		SCREENHEIGHT*0.903,
-		SCREENWIDTH,
-		SCREENHEIGHT*0.907,
+		LAUNCHER_SCREENHEIGHT*0.903,
+		LAUNCHER_SCREENWIDTH,
+		LAUNCHER_SCREENHEIGHT*0.907,
 		screenOptionsColour,
 		7
 	);
     al_draw_ustr(screenOptionsFont,
         screenOptionsColour,
-        SCREENWIDTH*0.5,
-        SCREENHEIGHT*0.90,
+        LAUNCHER_SCREENWIDTH*0.5,
+        LAUNCHER_SCREENHEIGHT*0.90,
         ALLEGRO_ALIGN_CENTRE,
         loadSimulationGoBackString
     );
-    drawTriangle(float(SCREENWIDTH)*0.4, float(SCREENHEIGHT)*0.935, 1, screenOptionsColour);
-    drawTriangle(float(SCREENWIDTH)*0.6, float(SCREENHEIGHT)*0.935, -1, screenOptionsColour);
+    drawTriangle(float(LAUNCHER_SCREENWIDTH)*0.4, float(LAUNCHER_SCREENHEIGHT)*0.935, 1, screenOptionsColour);
+    drawTriangle(float(LAUNCHER_SCREENWIDTH)*0.6, float(LAUNCHER_SCREENHEIGHT)*0.935, -1, screenOptionsColour);
     al_flip_display();
 }
 
@@ -1051,73 +1056,73 @@ void setupControlsScreen()
     al_clear_to_color(screenBackgroundColour);
     al_draw_ustr(screenTitleFont,
         screenOptionsColour,
-        SCREENWIDTH*0.5,
-        SCREENHEIGHT*0.005,
+        LAUNCHER_SCREENWIDTH*0.5,
+        LAUNCHER_SCREENHEIGHT*0.005,
         ALLEGRO_ALIGN_CENTRE,
         controlsScreenTitle
     );
 	//Horizontal Bar
     al_draw_rectangle(
         0,
-        SCREENHEIGHT*0.193,
-        SCREENWIDTH,
-        SCREENHEIGHT*0.197,
+        LAUNCHER_SCREENHEIGHT*0.193,
+        LAUNCHER_SCREENWIDTH,
+        LAUNCHER_SCREENHEIGHT*0.197,
         screenOptionsColour,
         7
     );
     al_draw_ustr(screenOptionsSmallFont,
         screenOptionsColour,
-        SCREENWIDTH*0.005,
-        SCREENHEIGHT*0.2,
+        LAUNCHER_SCREENWIDTH*0.005,
+        LAUNCHER_SCREENHEIGHT*0.2,
         ALLEGRO_ALIGN_LEFT,
 		controlsStringOne
     );
     al_draw_ustr(screenOptionsSmallFont,
         screenOptionsColour,
-        SCREENWIDTH*0.005,
-        SCREENHEIGHT*0.28,
+        LAUNCHER_SCREENWIDTH*0.005,
+        LAUNCHER_SCREENHEIGHT*0.28,
         ALLEGRO_ALIGN_LEFT,
 		controlsStringTwo
     );
     al_draw_ustr(screenOptionsSmallFont,
         screenOptionsColour,
-        SCREENWIDTH*0.005,
-        SCREENHEIGHT*0.36,
+        LAUNCHER_SCREENWIDTH*0.005,
+        LAUNCHER_SCREENHEIGHT*0.36,
         ALLEGRO_ALIGN_LEFT,
 		controlsStringThree
     );
     al_draw_ustr(screenOptionsSmallFont,
         screenOptionsColour,
-        SCREENWIDTH*0.005,
-        SCREENHEIGHT*0.44,
+        LAUNCHER_SCREENWIDTH*0.005,
+        LAUNCHER_SCREENHEIGHT*0.44,
         ALLEGRO_ALIGN_LEFT,
 		controlsStringFour
     );
     al_draw_ustr(screenOptionsSmallFont,
         screenOptionsColour,
-        SCREENWIDTH*0.005,
-        SCREENHEIGHT*0.52,
+        LAUNCHER_SCREENWIDTH*0.005,
+        LAUNCHER_SCREENHEIGHT*0.52,
         ALLEGRO_ALIGN_LEFT,
 		controlsStringFive
     );
 	//Horizontal Bar
 	al_draw_rectangle(
 		0,
-		SCREENHEIGHT*0.903,
-		SCREENWIDTH,
-		SCREENHEIGHT*0.907,
+		LAUNCHER_SCREENHEIGHT*0.903,
+		LAUNCHER_SCREENWIDTH,
+		LAUNCHER_SCREENHEIGHT*0.907,
 		screenOptionsColour,
 		7
 	);
     al_draw_ustr(screenOptionsFont,
         screenOptionsColour,
-        SCREENWIDTH*0.5,
-        SCREENHEIGHT*0.9,
+        LAUNCHER_SCREENWIDTH*0.5,
+        LAUNCHER_SCREENHEIGHT*0.9,
         ALLEGRO_ALIGN_CENTRE,
 		controlsGoBackString
     );
-    drawTriangle(float(SCREENWIDTH)*0.4, float(SCREENHEIGHT)*0.935, 1, screenOptionsColour);
-    drawTriangle(float(SCREENWIDTH)*0.6, float(SCREENHEIGHT)*0.935, -1, screenOptionsColour);
+    drawTriangle(float(LAUNCHER_SCREENWIDTH)*0.4, float(LAUNCHER_SCREENHEIGHT)*0.935, 1, screenOptionsColour);
+    drawTriangle(float(LAUNCHER_SCREENWIDTH)*0.6, float(LAUNCHER_SCREENHEIGHT)*0.935, -1, screenOptionsColour);
     al_flip_display();
 }
 
@@ -1127,67 +1132,72 @@ void setupCreditsScreen()
     al_clear_to_color(screenBackgroundColour);
     al_draw_ustr(screenTitleFont,
         screenOptionsColour,
-        SCREENWIDTH*0.5,
-        SCREENHEIGHT*0.005,
+        LAUNCHER_SCREENWIDTH*0.5,
+        LAUNCHER_SCREENHEIGHT*0.005,
         ALLEGRO_ALIGN_CENTRE,
         creditsScreenTitle
     );
 	//Horizontal Bar
     al_draw_rectangle(
         0,
-        SCREENHEIGHT*0.193,
-        SCREENWIDTH,
-        SCREENHEIGHT*0.197,
+        LAUNCHER_SCREENHEIGHT*0.193,
+        LAUNCHER_SCREENWIDTH,
+        LAUNCHER_SCREENHEIGHT*0.197,
         screenOptionsColour,
         7
     );
     al_draw_ustr(screenOptionsSmallFont,
         screenOptionsColour,
-        SCREENWIDTH*0.005,
-        SCREENHEIGHT*0.2,
+        LAUNCHER_SCREENWIDTH*0.005,
+        LAUNCHER_SCREENHEIGHT*0.2,
         ALLEGRO_ALIGN_LEFT,
         creditsStringOne
     );
     al_draw_ustr(screenOptionsSmallFont,
         screenOptionsColour,
-        SCREENWIDTH*0.005,
-        SCREENHEIGHT*0.28,
+        LAUNCHER_SCREENWIDTH*0.005,
+        LAUNCHER_SCREENHEIGHT*0.28,
         ALLEGRO_ALIGN_LEFT,
         creditsStringTwo
     );
     al_draw_ustr(screenOptionsSmallFont,
         screenOptionsColour,
-        SCREENWIDTH*0.005,
-        SCREENHEIGHT*0.36,
+        LAUNCHER_SCREENWIDTH*0.005,
+        LAUNCHER_SCREENHEIGHT*0.36,
         ALLEGRO_ALIGN_LEFT,
         creditsStringThree
     );
     al_draw_ustr(screenOptionsFont,
         screenOptionsColour,
-        SCREENWIDTH*0.5,
-        SCREENHEIGHT*0.70,
+        LAUNCHER_SCREENWIDTH*0.5,
+        LAUNCHER_SCREENHEIGHT*0.70,
         ALLEGRO_ALIGN_CENTRE,
         creditsStringFour
     );
 	//Horizontal Bar
 	al_draw_rectangle(
 		0,
-		SCREENHEIGHT*0.903,
-		SCREENWIDTH,
-		SCREENHEIGHT*0.907,
+		LAUNCHER_SCREENHEIGHT*0.903,
+		LAUNCHER_SCREENWIDTH,
+		LAUNCHER_SCREENHEIGHT*0.907,
 		screenOptionsColour,
 		7
 	);
     al_draw_ustr(screenOptionsFont,
         screenOptionsColour,
-        SCREENWIDTH*0.5,
-        SCREENHEIGHT*0.9,
+        LAUNCHER_SCREENWIDTH*0.5,
+        LAUNCHER_SCREENHEIGHT*0.9,
         ALLEGRO_ALIGN_CENTRE,
         creditsGoBackString
     );
-    drawTriangle(float(SCREENWIDTH)*0.4, float(SCREENHEIGHT)*0.935, 1, screenOptionsColour);
-    drawTriangle(float(SCREENWIDTH)*0.6, float(SCREENHEIGHT)*0.935, -1, screenOptionsColour);
+    drawTriangle(float(LAUNCHER_SCREENWIDTH)*0.4, float(LAUNCHER_SCREENHEIGHT)*0.935, 1, screenOptionsColour);
+    drawTriangle(float(LAUNCHER_SCREENWIDTH)*0.6, float(LAUNCHER_SCREENHEIGHT)*0.935, -1, screenOptionsColour);
     al_flip_display();
+}
+
+//Simulation Screen
+void setupSimulationScreen() {
+	cout << "this is the simulation screen" << endl;
 }
 
 //Initialization Functions
@@ -1213,24 +1223,24 @@ int initAddons() {
         cout << "failed to initialize the primitives addon!" << endl;
         return -1;
     }
-    settingsDisplay = al_create_display(SCREENWIDTH, SCREENHEIGHT);
+    settingsDisplay = al_create_display(LAUNCHER_SCREENWIDTH, LAUNCHER_SCREENHEIGHT);
     if (!settingsDisplay) {
         cout << "failed to create display!" << endl;
         return -1;
     }
-    screenOptionsFont = al_load_ttf_font(font1Path, SCREENWIDTH / 25.6, 0);
+    screenOptionsFont = al_load_ttf_font(font1Path, LAUNCHER_SCREENWIDTH / 25.6, 0);
     if (!screenOptionsFont) {
         cout << "Could not load \"testFont.ttf\"" << endl;
         cout << "Make sure the correct font is in the executable location!" << endl;
         screenOptionsFont = al_create_builtin_font();
     }
-    screenOptionsSmallFont = al_load_ttf_font(font1Path, SCREENWIDTH / 36.6, 0);
+    screenOptionsSmallFont = al_load_ttf_font(font1Path, LAUNCHER_SCREENWIDTH / 36.6, 0);
     if (!screenOptionsSmallFont) {
         cout << "Could not load \"testFont.ttf\"" << endl;
         cout << "Make sure the correct font is in the executable location!" << endl;
         screenOptionsSmallFont = al_create_builtin_font();
     }
-    screenTitleFont = al_load_ttf_font(font1Path, SCREENWIDTH / 12.8, 0);
+    screenTitleFont = al_load_ttf_font(font1Path, LAUNCHER_SCREENWIDTH / 12.8, 0);
     if (!screenTitleFont) {
         cout << "Could not load \"testFont.ttf\"" << endl;
         cout << "Make sure the correct font is in the executable location!" << endl;
