@@ -253,9 +253,10 @@ int main(int argc, char **argv) {
 							loadNewMenu(get<1>(response));
 							currentMenu = get<1>(response);
 							if (currentMenu == "Simulation") {
-								Game * game = new Game(512, 512, initializationValues);
+								Game * game = new Game(GAME_SCREENWIDTH*0.5, GAME_SCREENHEIGHT*0.5, initializationValues);
 								game->generate();
 								game->run();
+								game->printMapToFile();
 							}
 							currentMenuIndex = 0;
 						}
@@ -958,7 +959,7 @@ void exportSimluationConfiguration() {
 	streamForString << currentTimeSinceEpoch;
 	ofstream exportFile;
 	string fileNameString = "simulationSettingsExport_" + streamForString.str() + ".txt";
-	cout << "\tFile will be named " << fileNameString << endl;
+	cout << "\tConfiguration File will be named " << fileNameString << endl;
 	exportFile.open(fileNameString);
 	exportFile << "||===================================================||\n";
 	exportFile << "||     Project Psi Exported Configuration Setting    ||\n";
