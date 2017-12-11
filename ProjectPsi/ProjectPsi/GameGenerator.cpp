@@ -1,19 +1,21 @@
+//
+// Made by Bryton Leason for project Psi
+//
+
 //C++ includes
 #include <stdio.h>
-#include <string>
 #include <iostream>
-#include <vector>
 #include <ctime>
 #include <sstream>
 #include <fstream>
 
 //Other includes
-#include "Game.h"
+#include "GameGenerator.h"
 #include "AllegroSettings.h"
 
 using namespace std;
 
-Game::Game(int width, int height, string values[15]) {
+GameGenerator::GameGenerator(int width, int height, string values[15]) {
     widthOfBoard = width;
     heightOfBoard = height;
     for (int i = 0; i < 15; i++) {
@@ -21,7 +23,7 @@ Game::Game(int width, int height, string values[15]) {
     }
 }
 
-void Game::generate() {
+void GameGenerator::generate() {
     cout << "Game of size " << widthOfBoard << "x" << heightOfBoard << " is being generated" << endl;
     gameBoard.resize(heightOfBoard);
     for (int i = 0; i < heightOfBoard; i++) {
@@ -34,9 +36,10 @@ void Game::generate() {
     generateRivers();
     generateOceans();
     smooth();
+	cout << "\tBoard is generated!" << endl;
 }
 
-void Game::generateSand()
+void GameGenerator::generateSand()
 {
     for (int height = 0; height < heightOfBoard; height++) {
         for (int width = 0; width < widthOfBoard; width++) {
@@ -45,7 +48,7 @@ void Game::generateSand()
     }
 }
 
-void Game::generateSnow()
+void GameGenerator::generateSnow()
 {
     for (int height = 0; height < heightOfBoard; height++) {
         for (int width = 0; width < widthOfBoard; width++) {
@@ -54,7 +57,7 @@ void Game::generateSnow()
     }
 }
 
-void Game::generateForest()
+void GameGenerator::generateForest()
 {
     for (int height = 0; height < heightOfBoard; height++) {
         for (int width = 0; width < widthOfBoard; width++) {
@@ -63,7 +66,7 @@ void Game::generateForest()
     }
 }
 
-void Game::generateJungle()
+void GameGenerator::generateJungle()
 {
     for (int height = 0; height < heightOfBoard; height++) {
         for (int width = 0; width < widthOfBoard; width++) {
@@ -72,7 +75,7 @@ void Game::generateJungle()
     }
 }
 
-void Game::generateRivers()
+void GameGenerator::generateRivers()
 {
     for (int height = 0; height < heightOfBoard; height++) {
         for (int width = 0; width < widthOfBoard; width++) {
@@ -81,7 +84,7 @@ void Game::generateRivers()
     }
 }
 
-void Game::generateOceans()
+void GameGenerator::generateOceans()
 {
     for (int height = 0; height < heightOfBoard; height++) {
         for (int width = 0; width < widthOfBoard; width++) {
@@ -90,7 +93,7 @@ void Game::generateOceans()
     }
 }
 
-void Game::smooth()
+void GameGenerator::smooth()
 {
     for (int height = 0; height < heightOfBoard; height++) {
         for (int width = 0; width < widthOfBoard; width++) {
@@ -99,14 +102,7 @@ void Game::smooth()
     }
 }
 
-void Game::run() {
-    cout << "Game is running" << endl;
-    for (int i = 0; i < 15; i++) {
-        cout << "\tParameter " << i << ": " << initValues[i] << endl;
-    }
-}
-
-void Game::printMapToFile()
+void GameGenerator::printMapToFile()
 {
     cout << "Writing map to file" << endl;
     time_t currentTimeSinceEpoch = std::time(nullptr);

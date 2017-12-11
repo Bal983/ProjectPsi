@@ -1,9 +1,13 @@
+//
+// Made by Bryton Leason for project Psi
+//
+
 #pragma once
-#ifndef GAME_HEADER
-#define GAME_HEADER
+#ifndef GAMEGENERATOR_HEADER
+#define GAMEGENERATOR_HEADER
 #include <vector>
 
-class Game {
+class GameGenerator {
 	private:
 		int widthOfBoard;
 		int heightOfBoard;
@@ -15,11 +19,10 @@ class Game {
 		void generateJungle();
 		void generateRivers();
 		void generateOceans();
-	public:
-		Game(int, int, std::string values[15]);
-		void generate();
 		void smooth();
-		void run();
+	public:
+		GameGenerator(int, int, std::string values[15]);
+		void generate();
 		void printMapToFile();
 };
 #endif

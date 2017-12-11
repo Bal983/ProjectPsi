@@ -1,3 +1,7 @@
+//
+// Made by Bryton Leason for project Psi
+//
+
 #pragma once
 #ifndef ALLEGRO_HEADER
 #define ALLEGRO_HEADER
@@ -10,8 +14,8 @@
 	//TODO: set up Linux support of windowed full screen
 	#ifdef _WIN32
 		#include <Windows.h>
-		static const int GAME_SCREENWIDTH = GetSystemMetrics(SM_CXSCREEN);
-		static const int GAME_SCREENHEIGHT = GetSystemMetrics(SM_CYSCREEN);
+		static const int GAME_SCREENWIDTH = GetSystemMetrics(SM_CXSCREEN) * 0.9f;
+		static const int GAME_SCREENHEIGHT = GetSystemMetrics(SM_CYSCREEN) * 0.9f;
 	#else
 		//Try to keep only 16:9 resolution setups
 		static const int GAME_SCREENWIDTH = 1280;
@@ -24,10 +28,12 @@
 	static const char * font1Path = "assets\\testFont.ttf";
 	static ALLEGRO_DISPLAY *settingsDisplay = NULL;
 	static ALLEGRO_DISPLAY *mainDisplay = NULL;
+	static ALLEGRO_EVENT_QUEUE *settingsEventQueue = NULL;
 	static ALLEGRO_EVENT_QUEUE *mainEventQueue = NULL;
 	static bool quit = false;
 	static ALLEGRO_COLOR screenOptionsColour = al_map_rgb_f(0.8706, 0.7216, 0.5294); //burlywood colour
-	static ALLEGRO_COLOR screenBackgroundColour = al_map_rgb_f(0, 0, 0); //black colour
+	static ALLEGRO_COLOR menuScreenBackgroundColour = al_map_rgb_f(0, 0, 0); //black colour
+	static ALLEGRO_COLOR gameScreenBackgroundColour = al_map_rgb_f(0.8275, 0.8275, 0.8275); //dark grey colour
 	static ALLEGRO_FONT *screenOptionsFont = NULL;
 	static ALLEGRO_FONT *screenOptionsSmallFont = NULL;
 	static ALLEGRO_FONT *screenTitleFont = NULL;
