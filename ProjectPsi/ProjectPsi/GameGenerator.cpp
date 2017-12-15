@@ -26,8 +26,10 @@ GameGenerator::GameGenerator(int width, int height, string values[15]) {
 void GameGenerator::generate() {
     cout << "Game of size " << widthOfBoard << "x" << heightOfBoard << " is being generated" << endl;
     gameBoard.resize(heightOfBoard);
+	rgbGameBoard.resize(heightOfBoard);
     for (int i = 0; i < heightOfBoard; i++) {
         gameBoard[i].resize(widthOfBoard);
+		rgbGameBoard[i].resize(widthOfBoard);
     }
     generateSand();
     generateSnow();
@@ -36,6 +38,8 @@ void GameGenerator::generate() {
     generateRivers();
     generateOceans();
     smooth();
+	populateRgbMap();
+	writeBitMap();
 	cout << "\tBoard is generated!" << endl;
 }
 
@@ -102,6 +106,16 @@ void GameGenerator::smooth()
     }
 }
 
+void GameGenerator::populateRgbMap()
+{
+	for (int height = 0; height < heightOfBoard; height++) {
+		for (int width = 0; width < widthOfBoard; width++) {
+			rgbGameBoard[height][width] = rgbLookupMap.at(gameBoard[height][width]);
+		}
+	}
+
+}
+
 void GameGenerator::printMapToFile()
 {
     cout << "Writing map to file" << endl;
@@ -134,4 +148,72 @@ void GameGenerator::printMapToFile()
     mapFile.close();
 	cout << "\tNote: this file pretty much can't be viewed" << endl;
     cout << "\tDone generation!" << endl;
+
+}void GameGenerator::printRgbMapToFile()
+{
+	cout << "Writing map to file" << endl;
+	time_t currentTimeSinceEpoch = std::time(nullptr);
+	stringstream streamForString;
+	streamForString << currentTimeSinceEpoch;
+	ofstream mapFile;
+	string fileNameString = "generatedMapAsRgbValues_" + streamForString.str() + ".txt";
+	cout << "\tMap File will be named " << fileNameString << endl;
+	for (int height = 0; height < heightOfBoard; height++) {
+		for (int width = 0; width < widthOfBoard; width++) {
+			tuple<int, int, int> cachedValue = rgbGameBoard[height][width];
+			mapFile << "(" << get<0>(cachedValue) << ", " << get<1>(cachedValue) << ", " << get<2>(cachedValue) << ") ";
+		}
+		mapFile << "\n";
+	}
+	mapFile.close();
+	cout << "\tNote: this file pretty much can't be viewed" << endl;
+	cout << "\tDone generation!" << endl;
+}
+
+void GameGenerator::writeBitMap()
+{
+	BITMAPFILEHEADER bitmapFileHeader;
+	BITMAPINFOHEADER bitmapInfoHeader;
+
+	//Defining the file header
+	bitmapFileHeader.bfReserved1 = 0;
+	bitmapFileHeader.bfReserved2 = 0;
+	bitmapFileHeader.bfSize = 2 + sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + widthOfBoard * heightOfBoard * 3;
+	bitmapFileHeader.bfOffBits = 0x36;
+
+	//Defining the info header
+	bitmapInfoHeader.biSize = sizeof(BITMAPINFOHEADER);
+	bitmapInfoHeader.biWidth = widthOfBoard;
+	bitmapInfoHeader.biHeight = heightOfBoard;
+	bitmapInfoHeader.biPlanes = 1;
+	bitmapInfoHeader.biBitCount = 24;
+	bitmapInfoHeader.biCompression = 0;
+	bitmapInfoHeader.biSizeImage = 0;
+	bitmapInfoHeader.biXPelsPerMeter = 5000;
+	bitmapInfoHeader.biYPelsPerMeter = 5000;
+	bitmapInfoHeader.biClrUsed = 0;
+	bitmapInfoHeader.biClrImportant = 0;
+
+	FILE * bitMap;
+	cout << "\tBitMap be named " << "bitMapToUse.bmp" << endl;
+	bitMap = fopen("bitMapToUse.bmp", "w");
+
+	//This writes the headers
+	fwrite(&bitmapFileHeader, 1, sizeof(bitmapFileHeader), bitMap);
+	fwrite(&bitmapInfoHeader, 1, sizeof(bitmapInfoHeader), bitMap);
+
+	//This writes the bitmap
+	//Note: bitmaps are BGR not RGB
+	for (int height = 0; height < heightOfBoard; height++) {
+		for (int width = 0; width < widthOfBoard; width++) {
+			tuple<int, int, int> cachedValue = rgbGameBoard[height][width];
+			unsigned char red = get<0>(cachedValue);
+			unsigned char green = get<1>(cachedValue);
+			unsigned char blue = get<2>(cachedValue);
+			fwrite(&blue, 1, 1, bitMap);
+			fwrite(&green, 1, 1, bitMap);
+			fwrite(&red, 1, 1, bitMap);
+		}
+	}
+	fclose(bitMap);
 }

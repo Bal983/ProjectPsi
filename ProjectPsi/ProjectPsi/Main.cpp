@@ -24,7 +24,7 @@ int main(int argc, char **argv) {
 	case(1): //This is the case we are generating a game
 		GameGenerator * gameGenerator = new GameGenerator(GAME_SCREENWIDTH*0.5, GAME_SCREENHEIGHT*0.5, graphicsSystem->getInitializationValues());
 		gameGenerator->generate();
-		//gameGenerator->printMapToFile(); //Uncomment this if you want to see the generated array, it'll print to a file
+		gameGenerator->printMapToFile(); //Uncomment this if you want to see the generated array, it'll print to a file
 		GameManager * manager = new GameManager(gameGenerator, graphicsSystem);
 		manager->handleControl();
 	}
